@@ -6,6 +6,17 @@ final class HTMLTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(HTML().text, "Hello, World!")
+        
+        let renderer = Renderer()
+        
+        let list = List {
+            Text("123")
+            Text("123")
+            Text("123")
+        }
+            .ordered()
+            .indexStyle(.upperAlpha)
+        
+        print(renderer.render(list))
     }
 }
