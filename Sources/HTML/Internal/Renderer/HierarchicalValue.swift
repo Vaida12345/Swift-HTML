@@ -12,4 +12,6 @@ indirect enum HierarchicalValue {
     
     case stratum([HierarchicalValue])
     
+    case empty
+    
 }

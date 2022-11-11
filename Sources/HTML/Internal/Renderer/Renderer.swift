@@ -61,7 +61,7 @@ extension Renderer {
         } else if let content = value as? AnyMarkup {
             return self.organize(content.content, shouldOverrideTextWith: shouldOverrideTextWith)
         } else if value is EmptyMarkup {
-            return .value("")
+            return .empty
         } else if let content = value as? TupleMarkup {
             return .stratum(content.components.map { organize($0, shouldOverrideTextWith: shouldOverrideTextWith) })
         } else if let content = value as? List {
@@ -90,6 +90,26 @@ extension Renderer {
             case .unordered:
                 return organize(HTMLComponent(node: "ul", shouldIndent: true, contents: organize(content.contents, shouldOverrideTextWith: "li")))
             }
+        } else if let content = value as? WrappedMarkup {
+            return self.organize(HTMLComponent(node: content.node, contents: self.organize(content.content)))
+        } else if let content = value as? Image {
+            // render the image first, then the figure
+            var attributes: [(key: String, value: String)] = []
+            attributes.append(("src", content.source))
+            if let value = content.alternateText   { attributes.append(("alt",      value)) }
+            if let value = content.height          { attributes.append(("height",   value.description)) }
+            if let value = content.width           { attributes.append(("width",    value.description)) }
+            if let value = content.loadingStrategy { attributes.append(("loading",  value == .eager ? "eager" : "lazy")) }
+            if let value = content.longDescription { attributes.append(("longdesc", value)) }
+            
+            if let caption = content.caption {
+                return organize(HTMLComponent(node: "figure", contents: .stratum([
+                    organize(HTMLComponent(node: "img", attributes: attributes, contents: .empty)),
+                    organize(HTMLComponent(node: "figcaption", contents: .value(caption)))
+                ])))
+            } else {
+                return organize(HTMLComponent(node: "img", attributes: attributes, contents: .empty))
+            }
         }
         
         assert(!(value.body is Never))
@@ -109,8 +129,12 @@ extension Renderer {
                     return render($0, level: level + 1)
                 case .value(_):
                     return render($0, level: level)
+                case .empty:
+                    return ""
                 }
             }.joined(separator: "\n")
+        case .empty:
+            return ""
         }
     }
     
@@ -132,6 +156,8 @@ extension Renderer {
             }
         case .stratum(_):
             return .stratum([.value(leftNode), component.contents, .value("</\(component.nodeName)>")])
+        case .empty:
+            return .value(leftNode)
         }
     }
     
