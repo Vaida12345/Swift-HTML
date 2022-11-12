@@ -7,25 +7,50 @@
 
 
 /// A component only for the use of ``Renderer``.
-internal struct HTMLComponent {
+internal enum HTMLComponent {
     
-    let nodeName: String
+    case regular(node: String, attributes: [(key: String, value: String)] = [], shouldIndent: Bool = false, contents: HierarchicalValue)
     
-    let attributes: [(key: String, value: String)]
+    case contained(node: String, attributes: [(key: String, value: String)] = [], shouldIndent: Bool = false, contents: [HTMLComponent])
     
-    let contents: HierarchicalValue
+    case empty
     
-    let shouldIndent: Bool
+    case text(value: String)
     
-    /// Creates the component
-    ///
-    /// - Parameters:
-    ///   - shouldIndent: A bool determining whether an indentation is needed even if these is only one element in the body.
-    init(node: String, attributes: [(key: String, value: String)] = [], shouldIndent: Bool = false, contents: HierarchicalValue) {
-        self.nodeName = node
-        self.attributes = attributes
-        self.shouldIndent = shouldIndent
-        self.contents = contents
+    case stratum([HTMLComponent])
+    
+    internal var structure: HierarchicalValue {
+        switch self {
+        case .contained(let node, let attributes, let shouldIndent, let contents):
+            return HTMLComponent.regular(node: node, attributes: attributes, shouldIndent: shouldIndent, contents: .stratum(contents.map{ $0.structure })).structure
+        case .regular(let node, let attributes, let shouldIndent, let contents):
+            let leftNode = {
+                if attributes.isEmpty {
+                    return "<\(node)>"
+                } else {
+                    return "<\(node) \(attributes.map { $0.value.isEmpty ? ($0.key) : ($0.key + "=" + $0.value) }.joined(separator: " ") )>"
+                }
+            }()
+            
+            switch contents {
+            case .value(let value):
+                if shouldIndent {
+                    return .stratum([.value(leftNode), .value(value), .value("</\(node)>")])
+                } else {
+                    return .value(leftNode + value + "</\(node)>")
+                }
+            case .stratum(_):
+                return .stratum([.value(leftNode), contents, .value("</\(node)>")])
+            case .empty:
+                return .value(leftNode)
+            }
+        case .empty:
+            return .empty
+        case .text(let value):
+            return .value(value)
+        case .stratum(let components):
+            return .stratum(components.map(\.structure))
+        }
     }
     
 }

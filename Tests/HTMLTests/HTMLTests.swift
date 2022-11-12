@@ -9,13 +9,9 @@ final class HTMLTests: XCTestCase {
         
         let renderer = Renderer()
         
-        let list = List {
-            Text("123")
-            Text("123")
-            Text("123")
-        }
-            .ordered()
-            .indexStyle(.upperAlpha)
+        let list = Image(source: "12345")
+            .caption("456")
+            .frame(width: 123, height: 456)
         
         print(renderer.render(list))
     }

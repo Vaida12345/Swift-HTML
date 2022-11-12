@@ -26,10 +26,10 @@ public struct Renderer {
 extension Renderer {
     
     public func render(_ value: some Markup) -> String {
-        self.render(self.organize(value))
+        self.render(self.organize(value).structure)
     }
     
-    private func organize(_ value: some Markup, shouldOverrideTextWith: String? = nil) -> HierarchicalValue {
+    private func organize(_ value: some Markup, shouldOverrideTextWith: String? = nil) -> HTMLComponent {
         if let content = value as? Text {
             var node: String {
                 switch content.font {
@@ -50,14 +50,14 @@ extension Renderer {
                 }
             }
             
-            return organize(HTMLComponent(node: shouldOverrideTextWith ?? node, contents: .value(content.content)))
+            return .regular(node: shouldOverrideTextWith ?? node, contents: .value(content.content))
         } else if let content = value as? DescriptionList {
-            return organize(HTMLComponent(node: "dl", contents: .stratum(content.contents.flatMap {
+            return .contained(node: "dl", contents: content.contents.flatMap {
                 [
-                    organize(HTMLComponent(node: "dt", contents: .value($0.key))),
-                    organize(HTMLComponent(node: "dd", contents: .value($0.value)))
+                    .regular(node: "dt", contents: .value($0.key)),
+                    .regular(node: "dd", contents: .value($0.value))
                 ]
-            })))
+            })
         } else if let content = value as? AnyMarkup {
             return self.organize(content.content, shouldOverrideTextWith: shouldOverrideTextWith)
         } else if value is EmptyMarkup {
@@ -86,12 +86,12 @@ extension Renderer {
                 if let start = startValue, start != 1 { attributes.append(("start", start.description)) }
                 if isReversed { attributes.append(("reversed", "")) }
                 
-                return organize(HTMLComponent(node: "ol", attributes: attributes, shouldIndent: true, contents: organize(content.contents, shouldOverrideTextWith: "li")))
+                return .regular(node: "ol", attributes: attributes, shouldIndent: true, contents: organize(content.contents, shouldOverrideTextWith: "li").structure)
             case .unordered:
-                return organize(HTMLComponent(node: "ul", shouldIndent: true, contents: organize(content.contents, shouldOverrideTextWith: "li")))
+                return .regular(node: "ul", shouldIndent: true, contents: organize(content.contents, shouldOverrideTextWith: "li").structure)
             }
         } else if let content = value as? WrappedMarkup {
-            return self.organize(HTMLComponent(node: content.node, contents: self.organize(content.content)))
+            return .regular(node: content.node, contents: self.organize(content.content).structure)
         } else if let content = value as? Image {
             // render the image first, then the figure
             var attributes: [(key: String, value: String)] = []
@@ -103,12 +103,12 @@ extension Renderer {
             if let value = content.longDescription { attributes.append(("longdesc", value)) }
             
             if let caption = content.caption {
-                return organize(HTMLComponent(node: "figure", contents: .stratum([
-                    organize(HTMLComponent(node: "img", attributes: attributes, contents: .empty)),
-                    organize(HTMLComponent(node: "figcaption", contents: .value(caption)))
-                ])))
+                return .contained(node: "figure", contents: [
+                    .regular(node: "img", attributes: attributes, contents: .empty),
+                    .regular(node: "figcaption", contents: .value(caption))
+                ])
             } else {
-                return organize(HTMLComponent(node: "img", attributes: attributes, contents: .empty))
+                return .regular(node: "img", attributes: attributes, contents: .empty)
             }
         }
         
@@ -135,29 +135,6 @@ extension Renderer {
             }.joined(separator: "\n")
         case .empty:
             return ""
-        }
-    }
-    
-    private func organize(_ component: HTMLComponent) -> HierarchicalValue {
-        let leftNode = {
-            if component.attributes.isEmpty {
-                return "<\(component.nodeName)>"
-            } else {
-                return "<\(component.nodeName) \(component.attributes.map { $0.value.isEmpty ? ($0.key) : ($0.key + "=" + $0.value) }.joined(separator: " ") )>"
-            }
-        }()
-        
-        switch component.contents {
-        case .value(let value):
-            if component.shouldIndent {
-                return .stratum([.value(leftNode), .value(value), .value("</\(component.nodeName)>")])
-            } else {
-                return .value(leftNode + value + "</\(component.nodeName)>")
-            }
-        case .stratum(_):
-            return .stratum([.value(leftNode), component.contents, .value("</\(component.nodeName)>")])
-        case .empty:
-            return .value(leftNode)
         }
     }
     
