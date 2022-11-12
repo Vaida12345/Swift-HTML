@@ -100,7 +100,7 @@ extension Renderer {
         } else if let content = value as? Image {
             // render the image first, then the figure
             var attributes: [(key: String, value: String)] = []
-            attributes.append(("src", content.source))
+            attributes.append(("src", "\"\(content.source)\""))
             if let value = content.alternateText   { attributes.append(("alt",      "\"\(value)\"")) }
             if let value = content.height          { attributes.append(("height",   value.description)) }
             if let value = content.width           { attributes.append(("width",    value.description)) }
@@ -166,11 +166,11 @@ extension Renderer {
                         case .area(let coordinate):
                             var attributes: [(key: String, value: String)] = []
                             
-                            if let value = content.downloadFile { attributes.append(("download", "\"\(value)\"")) }
-                            if let value = content.href         { attributes.append(("href",     "\"\(value)\"")) }
-                            if let value = content.hrefLanguage { attributes.append(("hreflang", "\"\(value)\"")) }
-                            if let value = content.type         { attributes.append(("type",     "\"\(value)\"")) }
-                            if let value = content.alternative  { attributes.append(("alt",      "\"\(value)\"")) }
+                            if let value = $0.downloadFile { attributes.append(("download", "\"\(value)\"")) }
+                            if let value = $0.href         { attributes.append(("href",     "\"\(value)\"")) }
+                            if let value = $0.hrefLanguage { attributes.append(("hreflang", "\"\(value)\"")) }
+                            if let value = $0.type         { attributes.append(("type",     "\"\(value)\"")) }
+                            if let value = $0.alternative  { attributes.append(("alt",      "\"\(value)\"")) }
                             attributes.append(("coords", "\"\(Int(coordinate.origin.x)), \(Int(coordinate.origin.y)), \(Int(coordinate.width)), \(Int(coordinate.height))\""))
                             
                             return .regular(node: "area", attributes: attributes, contents: .empty)

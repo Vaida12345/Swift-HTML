@@ -9,12 +9,20 @@ final class HTMLTests: XCTestCase {
         
         let renderer = Renderer()
         
-        let list = Image(source: "1234567")
-            .onTapGesture(in: .zero, href: "2134", alternativeText: "32456789")
-            .onTapGesture(in: .zero, href: "2134", alternativeText: "32456789")
+//        var string = AttributedString("2")
+//        string.link = URL(string: "1234")!
+//        dump(string)
+//
+//        print(string.link)
+//        print(string)
+        
+        let list = Image(source: "image.heic")
+            .frame(width: 200, height: 400)
+            .longDescription("An example image")
+            .onTapGesture(in: CGRect(x: 10, y: 20, width: 100, height: 200), href: "book.html", alternativeText: "Book")
+            .onTapGesture(in: CGRect(x: 90, y: 26, width: 120, height: 219), href: "pan.html",  alternativeText: "Pan")
         
         dump(list)
-        
         print(renderer.render(list))
     }
 }
