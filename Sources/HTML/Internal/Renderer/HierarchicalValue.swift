@@ -10,7 +10,7 @@ indirect enum HierarchicalValue {
     
     case value(String)
     
-    case stratum([HierarchicalValue])
+    case stratum([HierarchicalValue], shouldIndent: Bool? = nil)
     
     case empty
     

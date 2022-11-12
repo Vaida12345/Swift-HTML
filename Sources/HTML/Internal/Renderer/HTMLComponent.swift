@@ -17,7 +17,21 @@ internal enum HTMLComponent {
     
     case text(value: String)
     
-    case stratum([HTMLComponent])
+    case stratum([HTMLComponent], shouldIndent: Bool? = nil)
+    
+    internal mutating func addAttribute(key: String, value: String?) {
+        guard let value else { return }
+        
+        switch self {
+        case .regular(let node, let attributes, let shouldIndent, let contents):
+            self = .regular(node: node, attributes: attributes + [(key, value)], shouldIndent: shouldIndent, contents: contents)
+        case .contained(let node, let attributes, let shouldIndent, let contents):
+            self = .contained(node: node, attributes: attributes + [(key, value)], shouldIndent: shouldIndent, contents: contents)
+        default:
+            print("Potential bug: attempting to change the attributes of non-regular HTML component.")
+            return
+        }
+    }
     
     internal var structure: HierarchicalValue {
         switch self {
@@ -35,11 +49,11 @@ internal enum HTMLComponent {
             switch contents {
             case .value(let value):
                 if shouldIndent {
-                    return .stratum([.value(leftNode), .value(value), .value("</\(node)>")])
+                    return .stratum([.value(leftNode), .stratum([.value(value)], shouldIndent: true), .value("</\(node)>")])
                 } else {
                     return .value(leftNode + value + "</\(node)>")
                 }
-            case .stratum(_):
+            case .stratum(_, _):
                 return .stratum([.value(leftNode), contents, .value("</\(node)>")])
             case .empty:
                 return .value(leftNode)
@@ -48,8 +62,8 @@ internal enum HTMLComponent {
             return .empty
         case .text(let value):
             return .value(value)
-        case .stratum(let components):
-            return .stratum(components.map(\.structure))
+        case .stratum(let components, let shouldIndent):
+            return .stratum(components.map(\.structure), shouldIndent: shouldIndent)
         }
     }
     

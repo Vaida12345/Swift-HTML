@@ -6,6 +6,9 @@
 //
 
 
+import Foundation
+
+
 /// The renderer to deal with converting the DSL to HTML.
 public struct Renderer {
     
@@ -47,6 +50,8 @@ extension Renderer {
                     return "h5"
                 case .heading6:
                     return "h6"
+                case .preFormatted:
+                    return "pre"
                 }
             }
             
@@ -63,7 +68,7 @@ extension Renderer {
         } else if value is EmptyMarkup {
             return .empty
         } else if let content = value as? TupleMarkup {
-            return .stratum(content.components.map { organize($0, shouldOverrideTextWith: shouldOverrideTextWith) })
+            return .stratum(content.components.map { organize($0, shouldOverrideTextWith: shouldOverrideTextWith) }, shouldIndent: false)
         } else if let content = value as? List {
             switch content.style {
             case let .ordered(isReversed, startValue, indexStyle):
@@ -82,7 +87,7 @@ extension Renderer {
                         return "I"
                     }
                 }
-                if indexStyle != .decimal { attributes.append(("type", style)) }
+                if indexStyle != .decimal { attributes.append(("type", "\"\(style)\"")) }
                 if let start = startValue, start != 1 { attributes.append(("start", start.description)) }
                 if isReversed { attributes.append(("reversed", "")) }
                 
@@ -96,11 +101,11 @@ extension Renderer {
             // render the image first, then the figure
             var attributes: [(key: String, value: String)] = []
             attributes.append(("src", content.source))
-            if let value = content.alternateText   { attributes.append(("alt",      value)) }
+            if let value = content.alternateText   { attributes.append(("alt",      "\"\(value)\"")) }
             if let value = content.height          { attributes.append(("height",   value.description)) }
             if let value = content.width           { attributes.append(("width",    value.description)) }
             if let value = content.loadingStrategy { attributes.append(("loading",  value == .eager ? "eager" : "lazy")) }
-            if let value = content.longDescription { attributes.append(("longdesc", value)) }
+            if let value = content.longDescription { attributes.append(("longdesc", "\"\(value)\"")) }
             
             if let caption = content.caption {
                 return .contained(node: "figure", contents: [
@@ -109,6 +114,71 @@ extension Renderer {
                 ])
             } else {
                 return .regular(node: "img", attributes: attributes, contents: .empty)
+            }
+        } else if let content = value as? Division {
+            return .regular(node: "div", contents: self.organize(content.content).structure)
+        } else if value is Divider {
+            return .regular(node: "hr", contents: .empty)
+        } else if let content = value as? Section {
+            return .regular(node: "section", contents: self.organize(content.content).structure)
+        } else if let content = value as? Script {
+            var attributes: [(key: String, value: String)] = []
+            if let value = content.source { attributes.append(("src",  "\"\(value)\"")) }
+            if let value = content.type   { attributes.append(("type", "\"\(value)\"")) }
+            
+            let mainContent = HTMLComponent.regular(node: "script", attributes: attributes, shouldIndent: true, contents: content.contents == nil ? .empty : .value(content.contents!))
+            
+            if let alternative = content.noScript {
+                return .stratum([
+                    mainContent,
+                    .regular(node: "noscript", contents: .value(alternative))
+                ], shouldIndent: false)
+            } else {
+                return mainContent
+            }
+        } else if let content = value as? TapedStateMarkup {
+            if content.kind == .anchor {
+                var attributes: [(key: String, value: String)] = []
+                if let value = content.downloadFile { attributes.append(("download", "\"\(value)\"")) }
+                if let value = content.href         { attributes.append(("href",     "\"\(value)\"")) }
+                if let value = content.hrefLanguage { attributes.append(("hreflang", "\"\(value)\"")) }
+                if let value = content.type         { attributes.append(("type",     "\"\(value)\"")) }
+                if let value = content.alternative  { attributes.append(("alt",      "\"\(value)\"")) }
+                
+                return .regular(node: "a", attributes: attributes, contents: organize(content.base).structure)
+            } else {
+                var base = content.base
+                var areas: [TapedStateMarkup] = [content]
+                // deep dive
+                while let child = base as? TapedStateMarkup {
+                    base = child.base
+                    areas.append(child)
+                }
+                
+                let id = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+                var baseComponent = organize(base)
+                baseComponent.addAttribute(key: "usemap", value: "\"" + "#" + id + "\"")
+                
+                return .stratum([
+                    baseComponent,
+                    .contained(node: "map", attributes: [("name", "\"\(id)\"")], contents: areas.map {
+                        switch $0.kind {
+                        case .area(let coordinate):
+                            var attributes: [(key: String, value: String)] = []
+                            
+                            if let value = content.downloadFile { attributes.append(("download", "\"\(value)\"")) }
+                            if let value = content.href         { attributes.append(("href",     "\"\(value)\"")) }
+                            if let value = content.hrefLanguage { attributes.append(("hreflang", "\"\(value)\"")) }
+                            if let value = content.type         { attributes.append(("type",     "\"\(value)\"")) }
+                            if let value = content.alternative  { attributes.append(("alt",      "\"\(value)\"")) }
+                            attributes.append(("coords", "\"\(Int(coordinate.origin.x)), \(Int(coordinate.origin.y)), \(Int(coordinate.width)), \(Int(coordinate.height))\""))
+                            
+                            return .regular(node: "area", attributes: attributes, contents: .empty)
+                        case .anchor:
+                            fatalError()
+                        }
+                    })
+                ], shouldIndent: false)
             }
         }
         
@@ -122,11 +192,11 @@ extension Renderer {
         switch value {
         case .value(let string):
             return indent + string
-        case .stratum(let array):
+        case .stratum(let array, let shouldIndent):
             return array.map {
                 switch $0 {
-                case .stratum(_):
-                    return render($0, level: level + 1)
+                case .stratum(_, _):
+                    return render($0, level: shouldIndent ?? true ? level + 1 : level)
                 case .value(_):
                     return render($0, level: level)
                 case .empty:

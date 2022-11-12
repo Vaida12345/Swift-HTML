@@ -53,6 +53,9 @@ public struct Text {
         /// The lowest-level section heading `<h6>`.
         case heading6
         
+        /// Pre-formatted text. Text within this element is typically displayed in a non-proportional font exactly as it is laid out in the file.
+        case preFormatted
+        
     }
     
     /// Modifies the font of the text.

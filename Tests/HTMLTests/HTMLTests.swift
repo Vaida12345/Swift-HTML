@@ -9,9 +9,11 @@ final class HTMLTests: XCTestCase {
         
         let renderer = Renderer()
         
-        let list = Image(source: "12345")
-            .caption("456")
-            .frame(width: 123, height: 456)
+        let list = Image(source: "1234567")
+            .onTapGesture(in: .zero, href: "2134", alternativeText: "32456789")
+            .onTapGesture(in: .zero, href: "2134", alternativeText: "32456789")
+        
+        dump(list)
         
         print(renderer.render(list))
     }
