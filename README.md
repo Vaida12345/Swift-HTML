@@ -77,9 +77,9 @@ print(renderer.render(text))
 ```
 Note that the `style` can be used repeatedly without generating duplicated code for the same style, as only the `id` is linked to the block.
 
-<details open>
+<details open=false>
     <summary>The converted HTML code</summary>
-    <code>
+```HTML
     <!DOCTYPE html>
     <html>
         <head>
@@ -98,5 +98,5 @@ Note that the `style` can be used repeatedly without generating duplicated code 
             <p class=iE0341D48_3F93_4E0A_BF79_5B806FC5A640>123456</p>
         </body>
     </html>
-    </code>
+```
 </details>
