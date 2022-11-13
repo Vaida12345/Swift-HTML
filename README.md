@@ -44,10 +44,9 @@ Text {
     }
     .highlight()
 }
-```
-This is:
+``` 
 
-<p>
+<p align="center">
     <mark>
         <b>Hello!</b>
         <br>
