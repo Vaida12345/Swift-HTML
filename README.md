@@ -79,22 +79,22 @@ Note that the `style` can be used repeatedly without generating duplicated code 
 
 The converted HTML code:
 ```HTML
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <title>12345</title>
-            <style>
-                .iE0341D48_3F93_4E0A_BF79_5B806FC5A640 {
-                    border-color: rgb(58, 129, 246);
-                    border-style: none none none solid;
-                    border-radius: 10;
-                    padding: 5px 5px 5px 5px;
-                    background-color: rgba(58, 129, 246, 0.20000000298023224);
-                }
-            </style>
-        </head>
-        <body>
-            <p class=iE0341D48_3F93_4E0A_BF79_5B806FC5A640>123456</p>
-        </body>
-    </html>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>12345</title>
+        <style>
+            .iE0341D48_3F93_4E0A_BF79_5B806FC5A640 {
+                border-color: rgb(58, 129, 246);
+                border-style: none none none solid;
+                border-radius: 10;
+                padding: 5px 5px 5px 5px;
+                background-color: rgba(58, 129, 246, 0.20000000298023224);
+            }
+        </style>
+    </head>
+    <body>
+        <p class=iE0341D48_3F93_4E0A_BF79_5B806FC5A640>123456</p>
+    </body>
+</html>
 ```
