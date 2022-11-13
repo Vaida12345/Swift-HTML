@@ -10,11 +10,9 @@ final class HTMLTests: XCTestCase {
         
         let renderer = Renderer()
         
-        let list = Audio(source: "dhuidhsaui.mp3", sourceType: "234")
-            .autoPlay()
-            .mute()
-            .hidden()
-            .loop()
+        let list = Image(source: "1234567")
+            .onTapGesture(action: "abc")
+            .onCopy(action: "456")
         
         print(renderer.render(list))
     }

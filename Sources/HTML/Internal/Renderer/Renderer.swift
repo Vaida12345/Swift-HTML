@@ -205,6 +205,20 @@ extension Renderer {
                 .regular(node: "source", attributes: [("src", "\"\(content.source)\"")] + (content.sourceType != nil ? [("type", "\"\(content.sourceType!)\"")] : []), contents: .empty),
                 .text(value: "Your browser does not support the video.")
             ])
+        } else if let content = value as? EventMarkup {
+            let base = content.source
+            var baseComponents = organize(markup: base)
+            
+            baseComponents.addAttribute(key: content.eventName, value: "\"\(content.action)\"")
+            
+            return baseComponents
+        } else if let content = value as? BoolAttributeMarkup {
+            let base = content.source
+            var baseComponents = organize(markup: base)
+            
+            baseComponents.addAttribute(key: content.nodeName, value: nil)
+            
+            return baseComponents
         }
         
         assert(!(value.body is Never))
