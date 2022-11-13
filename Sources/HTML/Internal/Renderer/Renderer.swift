@@ -7,6 +7,7 @@
 
 
 import Foundation
+import SwiftUI
 
 
 /// The renderer to deal with converting the DSL to HTML.
@@ -30,6 +31,10 @@ extension Renderer {
     
     public func render(_ value: some Markup) -> String {
         self.render(self.organize(markup: value).structure)
+    }
+    
+    public func render(_ value: StyleSheet) -> String {
+        self.render(self.organize(styleSheet: value))
     }
     
     private func organize(markup value: some Markup, shouldOverrideTextWith: String? = nil) -> HTMLComponent {
@@ -257,6 +262,77 @@ extension Renderer {
         return self.organize(text: value.textBody)
     }
     
+    private func organize(styleSheet: StyleSheet) -> HierarchicalValue {
+        var dictionary: [String: String] = [:]
+        
+        let cssColor = { (color: Color) in
+            let color = color.animatableData
+            if color[3] == 1 {
+                return ".rgb(\(color[0] * 255), \(color[1] * 255), \(color[2] * 255))"
+            } else {
+                return ".rgba(\(color[0] * 255), \(color[1] * 255), \(color[2] * 255), \(color[3])"
+            }
+        }
+        
+        let cssAlignment = { (alignment: Alignment) in
+            var horizontal: String {
+                switch alignment.horizontal {
+                case .leading:
+                    return "left"
+                case .center:
+                    return "center"
+                case .trailing:
+                    return "right"
+                default:
+                    return ""
+                }
+            }
+            
+            var vertical: String {
+                switch alignment.vertical {
+                case .top:
+                    return "top"
+                case .center:
+                    return "center"
+                case .bottom:
+                    return "bottom"
+                default:
+                    return ""
+                }
+            }
+            
+            return horizontal + " " + vertical
+        }
+        
+        if let value = styleSheet.backgroundColor        { dictionary["background-color"]  = cssColor(value) }
+        if let value = styleSheet.textColor              { dictionary["color"]             = cssColor(value) }
+        if let value = styleSheet.borderColor            { dictionary["border-color"]      = cssColor(value) }
+        if let value = styleSheet.opacity                { dictionary["opacity"]           = value.description }
+        
+        if let value = styleSheet.backgroundImage        { dictionary["background-image"]  = "\"url(\(value))\"" }
+        if let value = styleSheet.backgroundImageRepeat  { dictionary["background-repeat"] = {
+            switch value {
+            case .none:
+                return "no-repeat"
+            case .repeatHorizontally:
+                return "repeat-x"
+            case .repeatVertically:
+                return "repeat-y"
+            }
+        }() }
+        if let value = styleSheet.backgroundAlignment    { dictionary["background-position"]   = cssAlignment(value) }
+        if let value = styleSheet.backgroundImageIsFixed { dictionary["background-attachment"] = value ? "fixed" : "scroll" }
+        
+        if let value = styleSheet.borderStyle            { dictionary["border-style"]  = value.cssValue }
+        if let value = styleSheet.borderWidth            { dictionary["border-width"]  = value.cssValue }
+        if let value = styleSheet.borderCornerRadius     { dictionary["border-radius"] = value.description }
+        
+        if let value = styleSheet.margin                 { dictionary["margin"]        = value.cssValue }
+        if let value = styleSheet.padding                { dictionary["padding"]        = value.cssValue }
+        
+        return .stratum(dictionary.map { .value("\($0.key): \($0.value);") }, shouldIndent: true)
+    }
+    
     private func render(_ value: HierarchicalValue, level: Int = 0) -> String {
         let indent = [String](repeating: self.indentation, count: level).joined(separator: "")
         
@@ -277,6 +353,21 @@ extension Renderer {
         case .empty:
             return ""
         }
+    }
+    
+}
+
+
+internal extension Color {
+    
+    var animatableData: [Double] {
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+        let color = NSColor(self).usingColorSpace(.displayP3)!
+        return [color.redComponent, color.greenComponent, color.blueComponent, color.alphaComponent]
+#elseif canImport(UIKit)
+        let color = UIColor(self).cgColor.converted(to: CGColorSpace(name: CGColorSpace.displayP3)!, intent: .defaultIntent, options: nil)!
+        return color.components!.map { Double($0) } + [color.alpha]
+#endif
     }
     
 }

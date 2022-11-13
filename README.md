@@ -43,4 +43,13 @@ Text {
     .highlight()
 }
 ```
-![Example 1](https://github.com/Vaida12345/Swift-HTML/blob/main/Tests/Examples/Example 1)
+This is:
+
+<p>
+    <mark>
+        <b>Hello!</b>
+        <br>
+        <u><a href="123">Tap me!</a></u>
+    </mark>
+</p>
+

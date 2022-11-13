@@ -37,6 +37,7 @@ public struct StyleSheet {
         set { attributes["opacity"] = newValue }
     }
     
+    /// An url to the background image
     public var backgroundImage: String? {
         get { attributes["backgroundImage"] as? String }
         set { attributes["backgroundImage"] = newValue }
@@ -70,6 +71,18 @@ public struct StyleSheet {
     public var borderCornerRadius: Int? {
         get { attributes["borderCornerRadius"] as? Int }
         set { attributes["borderCornerRadius"] = newValue }
+    }
+    
+    /// The margin outside the borders.
+    public var margin: Margin? {
+        get { attributes["margin"] as? Margin }
+        set { attributes["margin"] = newValue }
+    }
+    
+    /// The padding inside the borders.
+    public var padding: Margin? {
+        get { attributes["padding"] as? Margin }
+        set { attributes["padding"] = newValue }
     }
     
     // MARK: - Instance Methods
@@ -132,6 +145,33 @@ public struct StyleSheet {
         
         case mixed(top: BorderStyle, right: BorderStyle, bottom: BorderStyle, left: BorderStyle)
         
+        internal var cssValue: String {
+            switch self {
+            case .dotted:
+                return "dotted"
+            case .dashed:
+                return "dashed"
+            case .solid:
+                return "solid"
+            case .doubleLine:
+                return "double"
+            case .groove:
+                return "groove"
+            case .ridge:
+                return "ridge"
+            case .inset:
+                return "inset"
+            case .outset:
+                return "outset"
+            case .none:
+                return "none"
+            case .hidden:
+                return "hidden"
+            case let .mixed(top, right, bottom, left):
+                return "\(top.cssValue) \(right.cssValue) \(bottom.cssValue) \(left.cssValue)"
+            }
+        }
+        
     }
     
     
@@ -146,6 +186,36 @@ public struct StyleSheet {
         case custom(px: Int)
         
         case mixed(top: BorderWidth, right: BorderWidth, bottom: BorderWidth, left: BorderWidth)
+        
+        internal var cssValue: String {
+            switch self {
+            case .thin:
+                return "thin"
+            case .medium:
+                return "medium"
+            case .thick:
+                return "thick"
+            case .custom(let px):
+                return "\(px) px"
+            case let .mixed(top, right, bottom, left):
+                return "\(top.cssValue) \(right.cssValue) \(bottom.cssValue) \(left.cssValue)"
+            }
+        }
+        
+    }
+    
+    /// The margin in pixels
+    public struct Margin {
+        
+        let left: Int
+        
+        let right: Int
+        
+        let top: Int
+        
+        let bottom: Int
+        
+        internal var cssValue: String { "\(top)px \(right)px \(bottom)px \(left)px" }
         
     }
     

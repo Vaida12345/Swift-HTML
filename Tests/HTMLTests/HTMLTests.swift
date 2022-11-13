@@ -14,8 +14,12 @@ final class HTMLTests: XCTestCase {
             .onTapGesture(action: "abc")
             .onCopy(action: "456")
         
-        let style = StyleSheet()
+        var style = StyleSheet()
+        style.borderStyle = .solid
+        style.borderCornerRadius = 10
+        style.padding = .init(left: 100, right: 100, top: 10, bottom: 10)
         
-        print(renderer.render(list))
+        print(renderer.render(style))
+        
     }
 }
