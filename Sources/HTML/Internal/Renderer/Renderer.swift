@@ -335,7 +335,43 @@ extension Renderer {
         if let value = styleSheet.borderCornerRadius     { dictionary["border-radius"] = value.description }
         
         if let value = styleSheet.margin                 { dictionary["margin"]        = value.cssValue }
-        if let value = styleSheet.padding                { dictionary["padding"]        = value.cssValue }
+        if let value = styleSheet.padding                { dictionary["padding"]       = value.cssValue }
+        
+        if let value = styleSheet.width                  { dictionary["width"]         = value.cssValue }
+        if let value = styleSheet.minWidth               { dictionary["min-width"]     = value.cssValue }
+        if let value = styleSheet.maxWidth               { dictionary["max-width"]     = value.cssValue }
+        if let value = styleSheet.height                 { dictionary["height"]        = value.cssValue }
+        if let value = styleSheet.minHeight              { dictionary["min-height"]    = value.cssValue }
+        if let value = styleSheet.maxHeight              { dictionary["max-height"]    = value.cssValue }
+        
+        if let value = styleSheet.textAlign              {
+            switch value.horizontal {
+            case .trailing:
+                dictionary["text-align"] = "right"
+            case .leading:
+                dictionary["text-align"] = "left"
+            case .center:
+                dictionary["text-align"] = "center"
+            default:
+                break
+            }
+            
+            switch value.vertical {
+            case .top:
+                dictionary["vertical-align"] = "top"
+            case .center:
+                dictionary["vertical-align"] = "middle"
+            case .bottom:
+                dictionary["vertical-align"] = "bottom"
+            default:
+                break
+            }
+        }
+        if let value = styleSheet.textTransform          { dictionary["text-transform"] = value.cssValue }
+        
+        if let value = styleSheet.fontFamily             { dictionary["font-family"]    = value }
+        
+        
         
         return .stratum(dictionary.map { .value("\($0.key): \($0.value);") }, shouldIndent: true)
     }

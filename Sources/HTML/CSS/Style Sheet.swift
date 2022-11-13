@@ -85,6 +85,53 @@ public struct StyleSheet {
         set { attributes["padding"] = newValue }
     }
     
+    public var width: Length? {
+        get { attributes["width"] as? Length }
+        set { attributes["width"] = newValue }
+    }
+    
+    public var minWidth: Length? {
+        get { attributes["minWidth"] as? Length }
+        set { attributes["minWidth"] = newValue }
+    }
+    
+    public var maxWidth: Length? {
+        get { attributes["maxWidth"] as? Length }
+        set { attributes["maxWidth"] = newValue }
+    }
+    
+    public var height: Length? {
+        get { attributes["height"] as? Length }
+        set { attributes["height"] = newValue }
+    }
+    
+    public var minHeight: Length? {
+        get { attributes["minHeight"] as? Length }
+        set { attributes["minHeight"] = newValue }
+    }
+    
+    public var maxHeight: Length? {
+        get { attributes["maxHeight"] as? Length }
+        set { attributes["maxHeight"] = newValue }
+    }
+    
+    public var textAlign: Alignment? {
+        get { attributes["textAlign"] as? Alignment }
+        set { attributes["textAlign"] = newValue }
+    }
+    
+    public var textTransform: TextTransform? {
+        get { attributes["textTransform"] as? TextTransform }
+        set { attributes["textTransform"] = newValue }
+    }
+    
+    public var fontFamily: String? {
+        get { attributes["fontFamily"] as? String }
+        set { attributes["fontFamily"] = newValue }
+    }
+    
+    
+    
     // MARK: - Instance Methods
     
     
@@ -183,7 +230,7 @@ public struct StyleSheet {
         
         case thick
         
-        case custom(px: Int)
+        case custom(pixel: Int)
         
         case mixed(top: BorderWidth, right: BorderWidth, bottom: BorderWidth, left: BorderWidth)
         
@@ -216,6 +263,48 @@ public struct StyleSheet {
         let bottom: Int
         
         internal var cssValue: String { "\(top)px \(right)px \(bottom)px \(left)px" }
+        
+    }
+    
+    public enum Length {
+        
+        case percentage(_ value: Double)
+        
+        case pixel(_ value: Int)
+        
+        internal var cssValue: String {
+            switch self {
+            case let .percentage(value):
+                return "\(value)%"
+            case let .pixel(value):
+                return "\(value)px"
+            }
+        }
+        
+    }
+    
+    public enum TextTransform {
+        
+        case upperCased
+        
+        case lowerCased
+        
+        case none
+        
+        case capitalize
+        
+        internal var cssValue: String {
+            switch self {
+            case .none:
+                return "none"
+            case .capitalize:
+                return "capitalize"
+            case .lowerCased:
+                return "lowercased"
+            case .upperCased:
+                return "uppercased"
+            }
+        }
         
     }
     
