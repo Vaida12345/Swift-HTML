@@ -14,6 +14,11 @@ public struct StyleSheet {
     
     private var attributes: [String: Any] = [:]
     
+    /// The id can be modified to customize the link.
+    ///
+    /// This value should be rarely used / read, please see ``Markup/style(_:)``.
+    public var id: String
+    
     
     // MARK: - Instance Properties
     
@@ -137,9 +142,17 @@ public struct StyleSheet {
     
     // MARK: - Designated Initializers
     
+    private init(attributes: [String : Any], id: String) {
+        self.attributes = attributes
+        self.id = id
+    }
+    
     
     // MARK: - Initializers
     
+    init() {
+        self.init(attributes: [:], id: UUID().uuidString.replacingOccurrences(of: "-", with: ""))
+    }
     
     // MARK: - Type Properties
     

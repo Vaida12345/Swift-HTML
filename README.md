@@ -54,3 +54,25 @@ Text {
     </mark>
 </p>
 
+
+---
+
+### Custom the style of your block
+
+This is a linear example, the SwiftUI-like example is below
+```
+let renderer = Renderer()
+        
+var style = StyleSheet()
+style.borderStyle = .mixed(top: .none, right: .none, bottom: .none, left: .solid)
+style.borderCornerRadius = 10
+style.borderColor = .blue
+style.backgroundColor = .blue.opacity(0.2)
+style.padding = .init(left: 5, right: 5, top: 5, bottom: 5)
+
+let text = Text("123456")
+    .style(style)
+
+print(renderer.render(text))
+```
+Note that the `style` can be used repeatedly without generating duplicated code for the same style, as only the `id` is linked to the block.
