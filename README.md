@@ -24,7 +24,7 @@ The code above is translated to:
 </map>
 ```
 
-===
+---
 
 ### Structured inline text components
 
