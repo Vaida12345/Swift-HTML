@@ -197,7 +197,7 @@ extension Renderer {
             if let value = content.type         { attributes.append(("type",     "\"\(value)\"")) }
             if let value = content.alternative  { attributes.append(("alt",      "\"\(value)\"")) }
             
-            return .regular(node: "a", attributes: attributes, shouldIndent: false, contents: organize(text: content.source).structure)
+            return .regular(node: "a", attributes: attributes, contents: organize(text: content.source).structure)
         } else if let content = value as? AbbreviatedText {
             return .regular(node: "abbr", attributes: [("title", content.title)], contents: organize(text: content.source).structure)
         } else if let content = value as? Group {
