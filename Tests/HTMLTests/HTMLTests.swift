@@ -17,10 +17,12 @@ final class HTMLTests: XCTestCase {
         style.backgroundColor = .blue.opacity(0.2)
         style.padding = .init(left: 5, right: 5, top: 5, bottom: 5)
         
-        let text = Text("123456")
-            .style(style)
+        let document = Document(title: "12345") {
+            Text("123456")
+                .style(style)
+        }
         
-        print(renderer.render(text))
+        print(renderer.render(document))
         
     }
 }

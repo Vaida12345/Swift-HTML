@@ -151,7 +151,7 @@ public struct StyleSheet {
     // MARK: - Initializers
     
     init() {
-        self.init(attributes: [:], id: UUID().uuidString.replacingOccurrences(of: "-", with: ""))
+        self.init(attributes: [:], id: "i" + UUID().uuidString.replacingOccurrences(of: "-", with: "_"))
     }
     
     // MARK: - Type Properties
