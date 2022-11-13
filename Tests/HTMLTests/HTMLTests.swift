@@ -14,6 +14,8 @@ final class HTMLTests: XCTestCase {
             .onTapGesture(action: "abc")
             .onCopy(action: "456")
         
+        let style = StyleSheet()
+        
         print(renderer.render(list))
     }
 }

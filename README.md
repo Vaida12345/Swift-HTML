@@ -1,5 +1,5 @@
 # Swift-HTML
-The HTML DSL with the aim of generating HTML &amp; CSS script with solely Swift.
+The HTML DSL with the aim of writing static web (generating HTML &amp; CSS script) with solely Swift.
 
 UNDER CONSTRUCTION
 
