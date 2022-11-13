@@ -6,6 +6,7 @@
 //
 
 
+/// A Markup created from a tuple of Markups.
 public struct TupleMarkup {
     
     let components: [AnyMarkup]

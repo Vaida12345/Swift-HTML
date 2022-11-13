@@ -17,6 +17,7 @@ public protocol Markup {
     associatedtype Body: Markup
     
     /// The contents of the markup.
+    @MarkupBuilder
     var body: Body { get }
     
 }

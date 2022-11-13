@@ -11,9 +11,9 @@
 /// This is different from ``Division`` in that it is only used to contain sections of a page, which the W3C defines as a group of content with a similar theme.
 public struct Section {
     
-    let content: TupleMarkup
+    let content: any Markup
     
-    public init(@MarkupBuilder content: ()-> TupleMarkup) {
+    public init(@MarkupBuilder content: () -> any Markup) {
         self.content = content()
     }
     

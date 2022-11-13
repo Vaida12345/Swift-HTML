@@ -13,18 +13,23 @@
 /// Also note that when the Text is used inside another structure, such as ``OrderedList``, the ``font(_:)`` is erased.
 public struct Text {
     
-    internal let content: String
+    internal let content: any AttributedText
     
     internal let font: Font
     
-    private init(content: String, font: Font) {
+    private init(content: any AttributedText, font: Font) {
         self.content = content
         self.font = font
     }
     
     /// Initialize a new paragraph with its content.
-    init(_ content: String) {
+    init(_ content: any AttributedText) {
         self.init(content: content, font: .paragraph)
+    }
+    
+    /// Initialize a new paragraph with its content.
+    init(@AttributedTextBuilder content: () -> any AttributedText) {
+        self.init(content: content(), font: .paragraph)
     }
     
     /// The font of the text.

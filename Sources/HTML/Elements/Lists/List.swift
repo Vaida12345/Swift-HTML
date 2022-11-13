@@ -11,16 +11,16 @@ public struct List {
     
     let style: ListType
     
-    let contents: TupleMarkup
+    let contents: any Markup
     
     
-    private init(style: ListType, contents: TupleMarkup) {
+    private init(style: ListType, contents: any Markup) {
         self.style = style
         self.contents = contents
     }
     
     /// Creates an list from `contents`.
-    public init(isOrdered: Bool = false, @MarkupBuilder contents: () -> TupleMarkup) {
+    public init(isOrdered: Bool = false, @MarkupBuilder contents: () -> any Markup) {
         self.init(style: isOrdered ? .ordered(isReversed: false, startValue: nil, indexStyle: .decimal) : .unordered, contents: contents())
     }
     
