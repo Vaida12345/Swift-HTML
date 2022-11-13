@@ -60,7 +60,7 @@ Text {
 ### Custom the style of your block
 
 This is a linear example, the SwiftUI-like example is below
-```
+```swift
 let renderer = Renderer()
         
 var style = StyleSheet()
