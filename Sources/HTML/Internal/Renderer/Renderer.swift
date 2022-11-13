@@ -180,6 +180,31 @@ extension Renderer {
                     })
                 ], shouldIndent: false)
             }
+        } else if let content = value as? Audio {
+            var attributes: [(key: String, value: String)] = []
+            if content.shouldAutoPlay { attributes.append(("autoplay", "")) }
+            if content.showControls   { attributes.append(("controls", "")) }
+            if content.isLooping      { attributes.append(("loop",     "")) }
+            if content.isMuted        { attributes.append(("mute",     "")) }
+            
+            return .contained(node: "audio", attributes: attributes, shouldIndent: true, contents: [
+                .regular(node: "source", attributes: [("src", "\"\(content.source)\"")] + (content.sourceType != nil ? [("type", "\"\(content.sourceType!)\"")] : []), contents: .empty),
+                .text(value: "Your browser does not support the audio.")
+            ])
+        } else if let content = value as? Video {
+            var attributes: [(key: String, value: String)] = []
+            if content.shouldAutoPlay     { attributes.append(("autoplay", "")) }
+            if content.showControls       { attributes.append(("controls", "")) }
+            if content.isLooping          { attributes.append(("loop",     "")) }
+            if content.isMuted            { attributes.append(("mute",     "")) }
+            if let value = content.poster { attributes.append(("poster",   "\"\(value)\"")) }
+            if let value = content.width  { attributes.append(("width",    value.description)) }
+            if let value = content.height { attributes.append(("height",   value.description)) }
+            
+            return .contained(node: "video", attributes: attributes, shouldIndent: true, contents: [
+                .regular(node: "source", attributes: [("src", "\"\(content.source)\"")] + (content.sourceType != nil ? [("type", "\"\(content.sourceType!)\"")] : []), contents: .empty),
+                .text(value: "Your browser does not support the video.")
+            ])
         }
         
         assert(!(value.body is Never))

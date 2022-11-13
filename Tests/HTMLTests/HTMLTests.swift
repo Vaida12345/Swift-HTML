@@ -10,20 +10,11 @@ final class HTMLTests: XCTestCase {
         
         let renderer = Renderer()
         
-        let list = Text {
-            Group {
-                "Hello!"
-                    .bold()
-                
-                TextSymbol.lineBreak
-                
-                LinkedText(href: "123") {
-                    "Tap me!"
-                }
-                .underline()
-            }
-            .highlight()
-        }
+        let list = Audio(source: "dhuidhsaui.mp3", sourceType: "234")
+            .autoPlay()
+            .mute()
+            .hidden()
+            .loop()
         
         print(renderer.render(list))
     }
