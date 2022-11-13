@@ -44,10 +44,10 @@ extension Renderer {
         
         let component = HTMLComponent.stratum([
             .regular(node: "!DOCTYPE html", content: .empty),
-            .contained(node: "html", contents: [
-                .contained(node: "head", contents: [
+            .regulars(node: "html", contents: [
+                .regulars(node: "head", contents: [
                     .regular(node: "title", content: .value(value.title)),
-                    .regular(node: "style", content: .stratum(styles.map { .stratum([.value("." + $0.id + " {"), organize(styleSheet: $0), .value("}")]) }))
+                    .regular(node: "style", content: .stratum(styles.map { .contained(lhs: "." + $0.id + " {", rhs: "}", content: organize(styleSheet: $0)) }))
                 ]),
                 .regular(node: "body", content: body)
             ])
@@ -85,7 +85,7 @@ extension Renderer {
             
             return .regular(node: shouldOverrideTextWith ?? node, content: self.organize(text: content.content))
         } else if let content = value as? DescriptionList {
-            return .contained(node: "dl", contents: content.contents.flatMap {
+            return .regulars(node: "dl", contents: content.contents.flatMap {
                 [
                     .regular(node: "dt", content: .value($0.key)),
                     .regular(node: "dd", content: .value($0.value))
@@ -136,7 +136,7 @@ extension Renderer {
             if let value = content.longDescription { attributes.append(("longdesc", "\"\(value)\"")) }
             
             if let caption = content.caption {
-                return .contained(node: "figure", contents: [
+                return .regulars(node: "figure", contents: [
                     .regular(node: "img", attributes: attributes, content: .empty),
                     .regular(node: "figcaption", content: .value(caption))
                 ])
@@ -189,7 +189,7 @@ extension Renderer {
                 
                 return .stratum([
                     baseComponent,
-                    .contained(node: "map", attributes: [("name", "\"\(id)\"")], contents: areas.map {
+                    .regulars(node: "map", attributes: [("name", "\"\(id)\"")], contents: areas.map {
                         switch $0.kind {
                         case .area(let coordinate):
                             var attributes: [(key: String, value: String)] = []
@@ -215,7 +215,7 @@ extension Renderer {
             if content.isLooping      { attributes.append(("loop",     "")) }
             if content.isMuted        { attributes.append(("mute",     "")) }
             
-            return .contained(node: "audio", attributes: attributes, contents: [
+            return .regulars(node: "audio", attributes: attributes, contents: [
                 .regular(node: "source", attributes: [("src", "\"\(content.source)\"")] + (content.sourceType != nil ? [("type", "\"\(content.sourceType!)\"")] : []), content: .empty),
                 .value("Your browser does not support the audio.")
             ])
@@ -229,7 +229,7 @@ extension Renderer {
             if let value = content.width  { attributes.append(("width",    value.description)) }
             if let value = content.height { attributes.append(("height",   value.description)) }
             
-            return .contained(node: "video", attributes: attributes, contents: [
+            return .regulars(node: "video", attributes: attributes, contents: [
                 .regular(node: "source", attributes: [("src", "\"\(content.source)\"")] + (content.sourceType != nil ? [("type", "\"\(content.sourceType!)\"")] : []), content: .empty),
                 .value("Your browser does not support the video.")
             ])
@@ -428,7 +428,7 @@ extension Renderer {
             default:
                 return indent + leftNode + "\n" + render(content, level: level + 1) + "\n" + indent + "</\(node)>"
             }
-        case .contained(let node, let attributes, let contents):
+        case .regulars(let node, let attributes, let contents):
             let leftNode = {
                 if attributes.isEmpty {
                     return "<\(node)>"
@@ -438,6 +438,8 @@ extension Renderer {
             }()
             
             return indent + leftNode + "\n" + render(.stratum(contents), level: level + 1) + "\n" + indent + "</\(node)>"
+        case let .contained(lhs, rhs, content):
+            return indent + lhs + "\n" + render(content, level: level + 1) + "\n" + indent + rhs
         case .empty:
             return ""
         case .value(let string):
