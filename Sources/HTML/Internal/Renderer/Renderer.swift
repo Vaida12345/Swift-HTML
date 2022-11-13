@@ -255,7 +255,7 @@ extension Renderer {
             styles.append(content.style)
             
             return baseComponents
-        } else if let content = value as? IdentifiedMarkup {
+        } else if let content = value as? IdentifiedClassMarkup {
             let base = content.source
             var baseComponents = organize(markup: base, styles: &styles)
             

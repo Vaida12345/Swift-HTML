@@ -27,7 +27,7 @@ public struct Document {
     
     /// Explicitly link the document with a stylesheet.
     ///
-    /// The styles can be linked to a block by matching ``StyleSheet/id`` and ``Markup/id(_:)``.
+    /// The styles can be linked to a block by matching ``StyleSheet/id`` and ``Markup/style(id:)``.
     ///
     /// - Note: This method should be rarely used, please see ``Markup/style(_:)``.
     public func with(style: StyleSheet) -> Document {
