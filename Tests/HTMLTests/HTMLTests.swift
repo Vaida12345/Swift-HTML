@@ -10,16 +10,17 @@ final class HTMLTests: XCTestCase {
         
         let renderer = Renderer()
         
-        let list = Image(source: "1234567")
-            .onTapGesture(action: "abc")
-            .onCopy(action: "456")
-        
         var style = StyleSheet()
-        style.borderStyle = .solid
+        style.borderStyle = .mixed(top: .none, right: .none, bottom: .none, left: .solid)
         style.borderCornerRadius = 10
-        style.padding = .init(left: 100, right: 100, top: 10, bottom: 10)
+        style.borderColor = .blue
+        style.backgroundColor = .blue.opacity(0.2)
+        style.padding = .init(left: 5, right: 5, top: 5, bottom: 5)
         
-        print(renderer.render(style))
+        let text = Text("123456")
+            .style(style)
+        
+        print(renderer.render(text))
         
     }
 }

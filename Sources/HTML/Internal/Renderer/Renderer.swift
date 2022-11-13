@@ -224,6 +224,13 @@ extension Renderer {
             baseComponents.addAttribute(key: content.nodeName, value: nil)
             
             return baseComponents
+        } else if let content = value as? StyledMarkup {
+            let base = content.source
+            var baseComponents = organize(markup: base)
+            
+            baseComponents.addAttribute(key: "style", value: "\"\(render(organize(styleSheet: content.style)).replacingOccurrences(of: "\n", with: " "))\"")
+            
+            return baseComponents
         }
         
         assert(!(value.body is Never))
@@ -268,9 +275,9 @@ extension Renderer {
         let cssColor = { (color: Color) in
             let color = color.animatableData
             if color[3] == 1 {
-                return ".rgb(\(color[0] * 255), \(color[1] * 255), \(color[2] * 255))"
+                return "rgb(\(Int(color[0] * 255)), \(Int(color[1] * 255)), \(Int(color[2] * 255)))"
             } else {
-                return ".rgba(\(color[0] * 255), \(color[1] * 255), \(color[2] * 255), \(color[3])"
+                return "rgba(\(Int(color[0] * 255)), \(Int(color[1] * 255)), \(Int(color[2] * 255)), \(color[3]))"
             }
         }
         
