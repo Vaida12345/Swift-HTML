@@ -24,7 +24,9 @@ The code above is translated to:
 </map>
 ```
 
-### Structued inline text components
+===
+
+### Structured inline text components
 
 Similar to the Regex Builder, the attribued text is achived by using a structure.
 ```swift
