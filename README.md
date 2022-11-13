@@ -9,7 +9,7 @@ UNDER CONSTRUCTION
 
 The swift code can be easily learned with the auto-completions that Xcode provides. It should be extremely familair to these who know SwiftUI.
 ```Swift
-let list = Image(source: "image.heic")
+Image(source: "image.heic")
     .frame(width: 200, height: 400)
     .longDescription("An example image")
     .onTapGesture(in: CGRect(x: 10, y: 20, width: 100, height: 200), href: "book.html", alternativeText: "Book")
@@ -22,4 +22,34 @@ The code above is translated to:
     <area href="pan.html" alt="Pan" coords="90, 26, 120, 219">
     <area href="book.html" alt="Book" coords="10, 20, 100, 200">
 </map>
+```
+
+### Structued inline text components
+
+Similar to the Regex Builder, the attribued text is achived by using a structure.
+```swift
+Text {
+    Group {
+        "Hello!"
+            .bold()
+
+        TextSymbol.lineBreak
+
+        LinkedText(href: "123") {
+            "Tap me!"
+        }
+        .underline()
+    }
+    .highlight()
+}
+```
+This can be translated to:
+```HTML
+<p>
+    <mark>
+        <b>Hello!</b>
+        <br>
+        <u><a href="123">Tap me!</a></u>
+    </mark>
+</p>
 ```
