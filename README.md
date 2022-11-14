@@ -78,7 +78,7 @@ print(renderer.render(text))
 Note that the `style` can be used repeatedly without generating duplicated code for the same style, as only the `id` is linked to the block.
 
 This is identical to 
-```
+```Swift
 Text("123456")
     .padding(.all, length: 5)
     .border(.mixed(top: .none, right: .none, bottom: .none, left: .solid), color: .blue,width: .medium)
