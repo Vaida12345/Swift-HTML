@@ -175,4 +175,12 @@ public extension Markup {
         return self.addStyle(sheet)
     }
     
+    func overflow(x: StyleSheet.OverflowStrategy? = nil, y: StyleSheet.OverflowStrategy? = nil) -> some Markup {
+        var sheet = StyleSheet()
+        sheet.overflowXStrategy = x
+        sheet.overflowYStrategy = y
+        
+        return self.addStyle(sheet)
+    }
+    
 }

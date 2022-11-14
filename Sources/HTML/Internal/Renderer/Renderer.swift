@@ -262,6 +262,18 @@ extension Renderer {
             }
             
             return baseComponents
+        } else if let content = value as? VariedStyledMarkup {
+            let content = content
+            let base = content.base
+            var baseComponents = organize(markup: base, styles: &styles)
+            
+            baseComponents.addAttribute(key: "class", value: "\"\(content.baseStyleID)\"")
+            
+            if !styles.contains(where: { $0.id == content.style.id }) {
+                styles.append(content.style)
+            }
+            
+            return baseComponents
         } else if let content = value as? InLineStyledMarkup {
             let base = content.source
             var baseComponents = organize(markup: base, styles: &styles)
@@ -380,16 +392,24 @@ extension Renderer {
         if let value = styleSheet.borderCornerRadius     { dictionary["border-radius"] = value.description }
         
         if let value = styleSheet.margin                 {
-            if let value = value.top                     { dictionary["margin-top"]    = value.cssValue }
-            if let value = value.right                   { dictionary["margin-right"]  = value.cssValue }
-            if let value = value.bottom                  { dictionary["margin-bottom"] = value.cssValue }
-            if let value = value.left                    { dictionary["margin-left"]   = value.cssValue }
+            if let value = value.allEqual() {
+                dictionary["margin"] = value.cssValue
+            } else {
+                if let value = value.top                     { dictionary["margin-top"]    = value.cssValue }
+                if let value = value.right                   { dictionary["margin-right"]  = value.cssValue }
+                if let value = value.bottom                  { dictionary["margin-bottom"] = value.cssValue }
+                if let value = value.left                    { dictionary["margin-left"]   = value.cssValue }
+            }
         }
         if let value = styleSheet.padding                {
-            if let value = value.top                     { dictionary["padding-top"]    = value.cssValue }
-            if let value = value.right                   { dictionary["padding-right"]  = value.cssValue }
-            if let value = value.bottom                  { dictionary["padding-bottom"] = value.cssValue }
-            if let value = value.left                    { dictionary["padding-left"]   = value.cssValue }
+            if let value = value.allEqual() {
+                dictionary["padding"] = value.cssValue
+            } else {
+                if let value = value.top                     { dictionary["padding-top"]    = value.cssValue }
+                if let value = value.right                   { dictionary["padding-right"]  = value.cssValue }
+                if let value = value.bottom                  { dictionary["padding-bottom"] = value.cssValue }
+                if let value = value.left                    { dictionary["padding-left"]   = value.cssValue }
+            }
         }
         
         if let value = styleSheet.width                  { dictionary["width"]         = value.cssValue }
@@ -462,8 +482,14 @@ extension Renderer {
             }
         }
         
-        if let value = styleSheet.overflowXStrategy  { dictionary["overflow-x"] = value.rawValue }
-        if let value = styleSheet.overflowYStrategy  { dictionary["overflow-y"] = value.rawValue }
+        if styleSheet.overflowXStrategy == styleSheet.overflowYStrategy {
+            if let value = styleSheet.overflowXStrategy  {
+                dictionary["overflow"] = value.rawValue
+            }
+        } else {
+            if let value = styleSheet.overflowXStrategy  { dictionary["overflow-x"] = value.rawValue }
+            if let value = styleSheet.overflowYStrategy  { dictionary["overflow-y"] = value.rawValue }
+        }
         
         if let value = styleSheet.floatStrategy      { dictionary["float"]      = value.rawValue }
         

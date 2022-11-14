@@ -336,12 +336,20 @@ public struct StyleSheet {
             self.bottom = bottom
         }
         
+        func allEqual() -> Length? {
+            if self.left == self.right && self.left == self.top && self.left == self.bottom {
+                return self.left
+            } else {
+                return nil
+            }
+        }
+        
         static func + (_ lhs: EdgeInsets, _ rhs: EdgeInsets) -> EdgeInsets {
             EdgeInsets(left: rhs.left ?? lhs.left, right: rhs.right ?? lhs.right, top: rhs.top ?? lhs.top, bottom: rhs.bottom ?? lhs.bottom)
         }
     }
     
-    public enum Length: ExpressibleByIntegerLiteral {
+    public enum Length: ExpressibleByIntegerLiteral, Equatable {
         
         case percentage(_ value: Double)
         

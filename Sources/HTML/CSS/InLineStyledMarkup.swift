@@ -32,7 +32,7 @@ public extension Markup {
     internal func asType<T>(_: T.Type) -> T? {
         if let content = self as? T {
             return content
-        } else if let content = self.body as? T {
+        } else if !(type(of: self).Body == Never.self), let content = self.body as? T {
             return content
         } else {
             return nil
