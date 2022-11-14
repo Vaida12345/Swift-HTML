@@ -29,8 +29,18 @@ extension InLineStyledMarkup: Markup {
 
 public extension Markup {
     
+    internal func asType<T>(_: T.Type) -> T? {
+        if let content = self as? T {
+            return content
+        } else if let content = self.body as? T {
+            return content
+        } else {
+            return nil
+        }
+    }
+    
     internal func addStyle(_ source: StyleSheet) -> InLineStyledMarkup {
-        if let content = self as? InLineStyledMarkup {
+        if let content = self.asType(InLineStyledMarkup.self) {
             var styles = content.style
             styles.addStyle(from: source)
             

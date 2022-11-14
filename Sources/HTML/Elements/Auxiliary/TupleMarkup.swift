@@ -88,8 +88,8 @@ public struct TupleMarkup {
         }
     }
     
-    internal func map(_ action: (AnyMarkup) -> AnyMarkup) -> TupleMarkup {
-        TupleMarkup(components: components.map(action))
+    internal func map(_ action: (AnyMarkup) -> any Markup) -> TupleMarkup {
+        TupleMarkup(components: components.map { AnyMarkup(action($0)) })
     }
     
 }

@@ -60,7 +60,7 @@ extension Renderer {
         self.render(self.organize(styleSheet: value))
     }
     
-    private func organize(markup value: some Markup, shouldOverrideTextWith: String? = nil, styles: inout [StyleSheet]) -> HTMLComponent {
+    private func organize(markup value: some Markup, styles: inout [StyleSheet]) -> HTMLComponent {
         if let content = value as? Text {
             var node: String {
                 switch content.font {
@@ -83,7 +83,7 @@ extension Renderer {
                 }
             }
             
-            return .regular(node: shouldOverrideTextWith ?? node, content: self.organize(text: content.content))
+            return .regular(node: node, content: self.organize(text: content.content))
         } else if let content = value as? DescriptionList {
             return .regulars(node: "dl", contents: content.contents.flatMap {
                 [
@@ -92,11 +92,11 @@ extension Renderer {
                 ]
             })
         } else if let content = value as? AnyMarkup {
-            return self.organize(markup: content.content, shouldOverrideTextWith: shouldOverrideTextWith, styles: &styles)
+            return self.organize(markup: content.content, styles: &styles)
         } else if value is EmptyMarkup {
             return .empty
         } else if let content = value as? TupleMarkup {
-            return .stratum(content.components.map { organize(markup: $0, shouldOverrideTextWith: shouldOverrideTextWith, styles: &styles) })
+            return .stratum(content.components.map { organize(markup: $0, styles: &styles) })
         } else if let content = value as? List {
             switch content.style {
             case let .ordered(isReversed, startValue, indexStyle):
@@ -119,9 +119,9 @@ extension Renderer {
                 if let start = startValue, start != 1 { attributes.append(("start", start.description)) }
                 if isReversed { attributes.append(("reversed", "")) }
                 
-                return .regular(node: "ol", attributes: attributes, content: organize(markup: content.contents, shouldOverrideTextWith: "li", styles: &styles))
+                return .regular(node: "ol", attributes: attributes, content: organize(markup: content.contents, styles: &styles))
             case .unordered:
-                return .regular(node: "ul", attributes: content.shouldHideDash ? [("list-style-type", "none")] : [], content: organize(markup: content.contents, shouldOverrideTextWith: "li", styles: &styles))
+                return .regular(node: "ul", content: organize(markup: content.contents, styles: &styles))
             }
         } else if let content = value as? WrappedMarkup {
             return .regular(node: content.node, content: self.organize(markup: content.content, styles: &styles))
@@ -173,7 +173,11 @@ extension Renderer {
                 if let value = content.type         { attributes.append(("type",     "\"\(value)\"")) }
                 if let value = content.alternative  { attributes.append(("alt",      "\"\(value)\"")) }
                 
-                return .regular(node: "a", attributes: attributes, content: organize(markup: content.base, styles: &styles))
+                if let base = content.base as? Text, let content = base.content as? String {
+                    return .regular(node: "a", attributes: attributes, content: .value(content))
+                } else {
+                    return .regular(node: "a", attributes: attributes, content: organize(markup: content.base, styles: &styles))
+                }
             } else {
                 var base = content.base
                 var areas: [TapedStateMarkup] = [content]
@@ -251,8 +255,11 @@ extension Renderer {
             let base = content.source
             var baseComponents = organize(markup: base, styles: &styles)
             
-            baseComponents.addAttribute(key: "class", value: content.style.id)
-            styles.append(content.style)
+            baseComponents.addAttribute(key: "class", value: "\"\(content.style.id)\"")
+            
+            if !styles.contains(where: { $0.id == content.style.id }) {
+                styles.append(content.style)
+            }
             
             return baseComponents
         } else if let content = value as? InLineStyledMarkup {

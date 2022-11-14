@@ -171,13 +171,12 @@ public struct StyleSheet {
         set { attributes["overflowYStrategy"] = newValue }
     }
     
-    /// Can be used when constructing HStack
     public var floatStrategy: FloatStrategy? {
         get { attributes["floatStrategy"] as? FloatStrategy }
         set { attributes["floatStrategy"] = newValue }
     }
     
-    public var alignment: Alignment? {
+    internal var alignment: Alignment? {
         get { attributes["alignment"] as? Alignment }
         set { attributes["alignment"] = newValue }
     }

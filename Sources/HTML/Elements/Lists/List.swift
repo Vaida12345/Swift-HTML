@@ -13,18 +13,21 @@ public struct List {
     
     let contents: any Markup
     
-    let shouldHideDash: Bool
-    
-    
-    private init(style: ListType, shouldHideDash: Bool = false, contents: any Markup) {
+    private init(style: ListType, contents: any Markup) {
         self.style = style
         self.contents = contents
-        self.shouldHideDash = shouldHideDash
     }
     
     /// Creates an list from `contents`.
     public init(isOrdered: Bool = false, @MarkupBuilder contents: () -> any Markup) {
-        self.init(style: isOrdered ? .ordered(isReversed: false, startValue: nil, indexStyle: .decimal) : .unordered, contents: contents())
+        let contents = contents()
+        self.init(style: isOrdered ? .ordered(isReversed: false, startValue: nil, indexStyle: .decimal) : .unordered, contents: {
+            if let contents = contents as? TupleMarkup {
+                return contents.map { WrappedMarkup(node: "li", content: $0) }
+            } else {
+                return WrappedMarkup(node: "li", content: contents)
+            }
+        }())
     }
     
     /// Reverse the indexes of the ordered list.
@@ -61,14 +64,10 @@ public struct List {
     }
     
     /// Hide the dashes of unordered list
-    public func dashHidden() -> List {
-        switch style {
-        case .ordered(_, _, _):
-            print("Attempting to modify the index style of an unordered list, which has no effect!")
-            return self
-        case .unordered:
-            return List(style: self.style, shouldHideDash: true, contents: self.contents)
-        }
+    public func dashHidden() -> some Markup {
+        var sheet = StyleSheet()
+        sheet.set("none", for: "list-style-type")
+        return self.addStyle(sheet)
     }
     
     public func ordered() -> List {

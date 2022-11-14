@@ -10,13 +10,17 @@ final class HTMLTests: XCTestCase {
         
         let renderer = Renderer()
         
-        let text = VStack {
-            Text("1234")
-            
-            Text("5678")
+        let document = Document(title: "1234") {
+            NavigationBar {
+                Text("1234")
+                    .onTapGesture(href: "1234")
+                
+                Text("5678")
+                    .onTapGesture(href: "5678")
+            }
         }
         
-        print(renderer.render(text))
+        print(renderer.render(document))
         
     }
 }

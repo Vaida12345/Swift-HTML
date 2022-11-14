@@ -13,12 +13,16 @@ public struct AnyMarkup {
     
     /// Erases the type of the `content`.
     public init(_ content: some Markup) {
-        self.content = content
+        if let content = content as? AnyMarkup {
+            self.content = content.content
+        } else {
+            self.content = content
+        }
     }
     
     init?(from box: Any) {
         guard let box = box as? any Markup else { return nil }
-        self.content = box
+        self.init(box)
     }
     
 }

@@ -71,7 +71,7 @@ public extension Markup {
         var sheet = StyleSheet()
         
         let keyPath = {
-            if let content = self as? InLineStyledMarkup {
+            if let content = self.asType(InLineStyledMarkup.self) {
                 let styles = content.style
                 
                 if let style = styles.borderStyle, style != .none {
@@ -85,7 +85,7 @@ public extension Markup {
         }()
         
         let originalEdges = {
-            if let content = self as? InLineStyledMarkup {
+            if let content = self.asType(InLineStyledMarkup.self) {
                 let styles = content.style
                 
                 if let style = styles[keyPath: keyPath] {
@@ -124,7 +124,7 @@ public extension Markup {
         return self.addStyle(sheet)
     }
     
-    func frame(minWidth: StyleSheet.Length? = nil, width: StyleSheet.Length? = nil, maxWidth: StyleSheet.Length? = nil, minHeight: StyleSheet.Length? = nil, height: StyleSheet.Length? = nil, maxHeight: StyleSheet.Length? = nil) -> some Markup {
+    func frame(minWidth: StyleSheet.Length? = nil, width: StyleSheet.Length? = nil, maxWidth: StyleSheet.Length? = nil, minHeight: StyleSheet.Length? = nil, height: StyleSheet.Length? = nil, maxHeight: StyleSheet.Length? = nil, alignment: StyleSheet.FloatStrategy) -> some Markup {
         var sheet = StyleSheet()
         sheet.minWidth = minWidth
         sheet.width = width
@@ -133,6 +133,8 @@ public extension Markup {
         sheet.minHeight = minHeight
         sheet.height = height
         sheet.maxHeight = maxHeight
+        
+        sheet.floatStrategy = alignment
         
         return self.addStyle(sheet)
     }
