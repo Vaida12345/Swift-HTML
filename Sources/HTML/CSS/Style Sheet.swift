@@ -79,14 +79,14 @@ public struct StyleSheet {
     }
     
     /// The margin outside the borders.
-    public var margin: Rect? {
-        get { attributes["margin"] as? Rect }
+    public var margin: EdgeInsets? {
+        get { attributes["margin"] as? EdgeInsets }
         set { attributes["margin"] = newValue }
     }
     
     /// The padding inside the borders.
-    public var padding: Rect? {
-        get { attributes["padding"] as? Rect }
+    public var padding: EdgeInsets? {
+        get { attributes["padding"] as? EdgeInsets }
         set { attributes["padding"] = newValue }
     }
     
@@ -179,6 +179,11 @@ public struct StyleSheet {
     
     // MARK: - Instance Methods
     
+    /// Add the styles from `sheet`, keeping only contents of `sheet` under conflict.
+    public mutating func addStyle(from sheet: StyleSheet) {
+        self.attributes.merge(sheet.attributes, uniquingKeysWith: { (_, new) in new })
+    }
+    
     
     // MARK: - Designated Initializers
     
@@ -221,7 +226,7 @@ public struct StyleSheet {
     
     
     /// The built-in border styles
-    public indirect enum BorderStyle {
+    public indirect enum BorderStyle: Equatable {
         
         case dotted
         
@@ -283,7 +288,7 @@ public struct StyleSheet {
         
         case thick
         
-        case custom(pixel: Int)
+        case custom(Length)
         
         case mixed(top: BorderWidth, right: BorderWidth, bottom: BorderWidth, left: BorderWidth)
         
@@ -295,8 +300,8 @@ public struct StyleSheet {
                 return "medium"
             case .thick:
                 return "thick"
-            case .custom(let px):
-                return "\(px) px"
+            case .custom(let value):
+                return "\(value.cssValue)"
             case let .mixed(top, right, bottom, left):
                 return "\(top.cssValue) \(right.cssValue) \(bottom.cssValue) \(left.cssValue)"
             }
@@ -304,7 +309,7 @@ public struct StyleSheet {
         
     }
     
-    public struct Rect {
+    public struct EdgeInsets {
         
         let left: Length?
         
@@ -314,6 +319,16 @@ public struct StyleSheet {
         
         let bottom: Length?
         
+        init(left: Length? = nil, right: Length? = nil, top: Length? = nil, bottom: Length? = nil) {
+            self.left = left
+            self.right = right
+            self.top = top
+            self.bottom = bottom
+        }
+        
+        static func + (_ lhs: EdgeInsets, _ rhs: EdgeInsets) -> EdgeInsets {
+            EdgeInsets(left: rhs.left ?? lhs.left, right: rhs.right ?? lhs.right, top: rhs.top ?? lhs.top, bottom: rhs.bottom ?? lhs.bottom)
+        }
     }
     
     public enum Length: ExpressibleByIntegerLiteral {
@@ -386,20 +401,20 @@ public struct StyleSheet {
         case `static`
         
         /// The position relative to its normal position.
-        case relative(rect: Rect)
+        case relative(rect: EdgeInsets)
         
         /// The position relative to the viewport.
         ///
         /// It always stays in the same place even if the page is scrolled. Anchors needs to be specified to position the block.
-        case fixed(rect: Rect)
+        case fixed(rect: EdgeInsets)
         
         /// The position relative to the nearest positioned ancestor (instead of positioned relative to the viewport, like fixed).
-        case absolute(rect: Rect)
+        case absolute(rect: EdgeInsets)
         
         /// The position based on the user's scroll position.
         ///
         /// A sticky element toggles between relative and fixed, depending on the scroll position. It is positioned relative until a given offset position is met in the viewport - then it "sticks" in place (like position:fixed).
-        case sticky(rect: Rect)
+        case sticky(rect: EdgeInsets)
     }
     
     

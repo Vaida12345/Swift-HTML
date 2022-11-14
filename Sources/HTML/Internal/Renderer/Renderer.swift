@@ -255,6 +255,13 @@ extension Renderer {
             styles.append(content.style)
             
             return baseComponents
+        } else if let content = value as? InLineStyledMarkup {
+            let base = content.source
+            var baseComponents = organize(markup: base, styles: &styles)
+            
+            baseComponents.addAttribute(key: "style", value: "\"\(render(organize(styleSheet: content.style)).replacingOccurrences(of: "\n", with: " "))\"")
+            
+            return baseComponents
         } else if let content = value as? IdentifiedClassMarkup {
             let base = content.source
             var baseComponents = organize(markup: base, styles: &styles)

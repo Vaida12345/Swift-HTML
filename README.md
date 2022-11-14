@@ -59,12 +59,12 @@ Text {
 
 ### Custom the style of your block
 
-This is a linear example, the SwiftUI-like example is below
 ```swift
 let renderer = Renderer()
         
 var style = StyleSheet()
 style.borderStyle = .mixed(top: .none, right: .none, bottom: .none, left: .solid)
+style.borderWidth = .medium
 style.borderCornerRadius = 10
 style.borderColor = .blue
 style.backgroundColor = .blue.opacity(0.2)
@@ -76,6 +76,15 @@ let text = Text("123456")
 print(renderer.render(text))
 ```
 Note that the `style` can be used repeatedly without generating duplicated code for the same style, as only the `id` is linked to the block.
+
+This is identical to 
+```
+Text("123456")
+    .padding(.all, length: 5)
+    .border(.mixed(top: .none, right: .none, bottom: .none, left: .solid), color: .blue,width: .medium)
+    .cornerRadius(10)
+    .background(color: .blue.opacity(0.2))
+```
 
 The converted HTML code:
 ```HTML

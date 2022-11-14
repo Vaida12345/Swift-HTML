@@ -12,17 +12,21 @@ final class HTMLTests: XCTestCase {
         
         var style = StyleSheet()
         style.borderStyle = .mixed(top: .none, right: .none, bottom: .none, left: .solid)
+        style.borderWidth = .medium
         style.borderCornerRadius = 10
         style.borderColor = .blue
         style.backgroundColor = .blue.opacity(0.2)
         style.padding = .init(left: 5, right: 5, top: 5, bottom: 5)
         
-        let document = Document(title: "12345") {
-            Text("123456")
-                .style(style)
-        }
+        let text = Text("123456")
+            .padding(.all, length: 5)
+            .border(.mixed(top: .none, right: .none, bottom: .none, left: .solid), color: .blue,width: .medium)
+            .cornerRadius(10)
+            .background(color: .blue.opacity(0.2))
         
-        print(renderer.render(document))
+        print(renderer.render(text))
         
     }
 }
+
+

@@ -67,7 +67,7 @@ public struct Text {
     ///
     /// - Parameters:
     ///   - newValue: The font for the text.
-    public func font(_ newValue: Font) -> Text {
+    public func fontStyle(_ newValue: Font) -> Text {
         Text(content: self.content, font: newValue)
     }
     
