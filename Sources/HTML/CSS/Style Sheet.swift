@@ -158,13 +158,11 @@ public struct StyleSheet {
         set { attributes["position"] = newValue }
     }
     
-    /// Maps to ScrollView.
     public var overflowXStrategy: OverflowStrategy? {
         get { attributes["overflowXStrategy"] as? OverflowStrategy }
         set { attributes["overflowXStrategy"] = newValue }
     }
     
-    /// Maps to ScrollView.
     public var overflowYStrategy: OverflowStrategy? {
         get { attributes["overflowYStrategy"] as? OverflowStrategy }
         set { attributes["overflowYStrategy"] = newValue }
