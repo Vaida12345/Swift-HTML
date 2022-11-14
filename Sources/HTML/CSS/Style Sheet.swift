@@ -79,14 +79,14 @@ public struct StyleSheet {
     }
     
     /// The margin outside the borders.
-    public var margin: Margin? {
-        get { attributes["margin"] as? Margin }
+    public var margin: Rect? {
+        get { attributes["margin"] as? Rect }
         set { attributes["margin"] = newValue }
     }
     
     /// The padding inside the borders.
-    public var padding: Margin? {
-        get { attributes["padding"] as? Margin }
+    public var padding: Rect? {
+        get { attributes["padding"] as? Rect }
         set { attributes["padding"] = newValue }
     }
     
@@ -130,9 +130,49 @@ public struct StyleSheet {
         set { attributes["textTransform"] = newValue }
     }
     
+    public var hideTextDecoration: Bool? {
+        get { attributes["hideTextDecoration"] as? Bool }
+        set { attributes["hideTextDecoration"] = newValue }
+    }
+    
     public var fontFamily: String? {
         get { attributes["fontFamily"] as? String }
         set { attributes["fontFamily"] = newValue }
+    }
+    
+    /// The font size in pixels
+    public var fontSize: Int? {
+        get { attributes["fontSize"] as? Int }
+        set { attributes["fontSize"] = newValue }
+    }
+    
+    /// The display style for the block. Maybe map to VSTack or HStack?
+    public var displayStyle: DisplayStyle? {
+        get { attributes["displayStyle"] as? DisplayStyle }
+        set { attributes["displayStyle"] = newValue }
+    }
+    
+    public var position: Position? {
+        get { attributes["position"] as? Position }
+        set { attributes["position"] = newValue }
+    }
+    
+    /// Maps to ScrollView.
+    public var overflowXStrategy: OverflowStrategy? {
+        get { attributes["overflowXStrategy"] as? OverflowStrategy }
+        set { attributes["overflowXStrategy"] = newValue }
+    }
+    
+    /// Maps to ScrollView.
+    public var overflowYStrategy: OverflowStrategy? {
+        get { attributes["overflowYStrategy"] as? OverflowStrategy }
+        set { attributes["overflowYStrategy"] = newValue }
+    }
+    
+    /// Can be used when constructing HStack
+    public var floatStrategy: FloatStrategy? {
+        get { attributes["floatStrategy"] as? FloatStrategy }
+        set { attributes["floatStrategy"] = newValue }
     }
     
     
@@ -264,26 +304,27 @@ public struct StyleSheet {
         
     }
     
-    /// The margin in pixels
-    public struct Margin {
+    public struct Rect {
         
-        let left: Int
+        let left: Length?
         
-        let right: Int
+        let right: Length?
         
-        let top: Int
+        let top: Length?
         
-        let bottom: Int
-        
-        internal var cssValue: String { "\(top)px \(right)px \(bottom)px \(left)px" }
+        let bottom: Length?
         
     }
     
-    public enum Length {
+    public enum Length: ExpressibleByIntegerLiteral {
         
         case percentage(_ value: Double)
         
         case pixel(_ value: Int)
+        
+        public init(integerLiteral value: IntegerLiteralType) {
+            self = .pixel(value)
+        }
         
         internal var cssValue: String {
             switch self {
@@ -318,6 +359,74 @@ public struct StyleSheet {
                 return "uppercased"
             }
         }
+        
+    }
+    
+    public enum DisplayStyle: String {
+        
+        case inline
+        
+        case block
+        
+        /// Displays list items horizontally instead of vertically
+        case inlineBlock = "inline-block"
+        
+        internal var cssValue: String {
+            self.rawValue
+        }
+        
+    }
+    
+    /// The position of the block.
+    public enum Position {
+        
+        /// The default position.
+        ///
+        /// Static positioned elements are not affected by the top, bottom, left, and right properties.
+        case `static`
+        
+        /// The position relative to its normal position.
+        case relative(rect: Rect)
+        
+        /// The position relative to the viewport.
+        ///
+        /// It always stays in the same place even if the page is scrolled. Anchors needs to be specified to position the block.
+        case fixed(rect: Rect)
+        
+        /// The position relative to the nearest positioned ancestor (instead of positioned relative to the viewport, like fixed).
+        case absolute(rect: Rect)
+        
+        /// The position based on the user's scroll position.
+        ///
+        /// A sticky element toggles between relative and fixed, depending on the scroll position. It is positioned relative until a given offset position is met in the viewport - then it "sticks" in place (like position:fixed).
+        case sticky(rect: Rect)
+    }
+    
+    
+    public enum OverflowStrategy: String {
+        
+        /// The default strategy, renders outside the element's box
+        case visible
+        
+        /// The overflow is clipped, and the rest of the content is hidden.
+        case hidden
+        
+        /// The overflow is clipped and a scrollbar is added to scroll inside the box
+        case scroll
+        
+        /// Adds scrollbars only when necessary
+        case auto
+        
+    }
+    
+    public enum FloatStrategy: String {
+        
+        case left
+        
+        case right
+        
+        /// The default value
+        case none
         
     }
     

@@ -121,7 +121,7 @@ extension Renderer {
                 
                 return .regular(node: "ol", attributes: attributes, content: organize(markup: content.contents, shouldOverrideTextWith: "li", styles: &styles))
             case .unordered:
-                return .regular(node: "ul", content: organize(markup: content.contents, shouldOverrideTextWith: "li", styles: &styles))
+                return .regular(node: "ul", attributes: content.shouldHideDash ? [("list-style-type", "none")] : [], content: organize(markup: content.contents, shouldOverrideTextWith: "li", styles: &styles))
             }
         } else if let content = value as? WrappedMarkup {
             return .regular(node: content.node, content: self.organize(markup: content.content, styles: &styles))
@@ -365,8 +365,18 @@ extension Renderer {
         if let value = styleSheet.borderWidth            { dictionary["border-width"]  = value.cssValue }
         if let value = styleSheet.borderCornerRadius     { dictionary["border-radius"] = value.description }
         
-        if let value = styleSheet.margin                 { dictionary["margin"]        = value.cssValue }
-        if let value = styleSheet.padding                { dictionary["padding"]       = value.cssValue }
+        if let value = styleSheet.margin                 {
+            if let value = value.top                     { dictionary["margin-top"]    = value.cssValue }
+            if let value = value.right                   { dictionary["margin-right"]  = value.cssValue }
+            if let value = value.bottom                  { dictionary["margin-bottom"] = value.cssValue }
+            if let value = value.left                    { dictionary["margin-left"]   = value.cssValue }
+        }
+        if let value = styleSheet.padding                {
+            if let value = value.top                     { dictionary["padding-top"]    = value.cssValue }
+            if let value = value.right                   { dictionary["padding-right"]  = value.cssValue }
+            if let value = value.bottom                  { dictionary["padding-bottom"] = value.cssValue }
+            if let value = value.left                    { dictionary["padding-left"]   = value.cssValue }
+        }
         
         if let value = styleSheet.width                  { dictionary["width"]         = value.cssValue }
         if let value = styleSheet.minWidth               { dictionary["min-width"]     = value.cssValue }
@@ -398,10 +408,50 @@ extension Renderer {
                 break
             }
         }
-        if let value = styleSheet.textTransform          { dictionary["text-transform"] = value.cssValue }
+        if let value = styleSheet.textTransform  { dictionary["text-transform"] = value.cssValue }
+        if let value = styleSheet.hideTextDecoration, value { dictionary["text-decoration"] = "none" }
         
-        if let value = styleSheet.fontFamily             { dictionary["font-family"]    = value }
+        if let value = styleSheet.fontFamily     { dictionary["font-family"]    = value }
+        if let value = styleSheet.fontSize       { dictionary["font-size"]      = value.description + "px" }
         
+        if let value = styleSheet.displayStyle   { dictionary["display"]        = value.cssValue }
+        
+        if let value = styleSheet.position       {
+            switch value {
+            case .static:
+                dictionary["position"] = "static"
+            case let .relative(rect):
+                dictionary["position"] = "relative"
+                if let value = rect.top    { dictionary["top"]    = value.cssValue }
+                if let value = rect.right  { dictionary["right"]  = value.cssValue }
+                if let value = rect.bottom { dictionary["bottom"] = value.cssValue }
+                if let value = rect.left   { dictionary["left"]   = value.cssValue }
+            case let .fixed(rect):
+                dictionary["position"] = "fixed"
+                if let value = rect.top    { dictionary["top"]    = value.cssValue }
+                if let value = rect.right  { dictionary["right"]  = value.cssValue }
+                if let value = rect.bottom { dictionary["bottom"] = value.cssValue }
+                if let value = rect.left   { dictionary["left"]   = value.cssValue }
+            case let .absolute(rect):
+                dictionary["position"] = "absolute"
+                if let value = rect.top    { dictionary["top"]    = value.cssValue }
+                if let value = rect.right  { dictionary["right"]  = value.cssValue }
+                if let value = rect.bottom { dictionary["bottom"] = value.cssValue }
+                if let value = rect.left   { dictionary["left"]   = value.cssValue }
+            case let .sticky(rect):
+                dictionary["position"] = "sticky"
+                dictionary["position"] = "-webkit-sticky"
+                if let value = rect.top    { dictionary["top"]    = value.cssValue }
+                if let value = rect.right  { dictionary["right"]  = value.cssValue }
+                if let value = rect.bottom { dictionary["bottom"] = value.cssValue }
+                if let value = rect.left   { dictionary["left"]   = value.cssValue }
+            }
+        }
+        
+        if let value = styleSheet.overflowXStrategy  { dictionary["overflow-x"] = value.rawValue }
+        if let value = styleSheet.overflowYStrategy  { dictionary["overflow-y"] = value.rawValue }
+        
+        if let value = styleSheet.floatStrategy      { dictionary["float"]      = value.rawValue }
         
         
         return .stratum(dictionary.map { .value("\($0.key): \($0.value);") })

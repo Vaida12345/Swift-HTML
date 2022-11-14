@@ -13,10 +13,13 @@ public struct List {
     
     let contents: any Markup
     
+    let shouldHideDash: Bool
     
-    private init(style: ListType, contents: any Markup) {
+    
+    private init(style: ListType, shouldHideDash: Bool = false, contents: any Markup) {
         self.style = style
         self.contents = contents
+        self.shouldHideDash = shouldHideDash
     }
     
     /// Creates an list from `contents`.
@@ -54,6 +57,17 @@ public struct List {
         case .unordered:
             print("Attempting to modify the index style of an unordered list, which has no effect!")
             return self
+        }
+    }
+    
+    /// Hide the dashes of unordered list
+    public func dashHidden() -> List {
+        switch style {
+        case .ordered(_, _, _):
+            print("Attempting to modify the index style of an unordered list, which has no effect!")
+            return self
+        case .unordered:
+            return List(style: self.style, shouldHideDash: true, contents: self.contents)
         }
     }
     
