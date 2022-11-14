@@ -10,7 +10,7 @@ public struct NavigationBar: Markup {
     
     let content: TupleMarkup
     
-    public var listStyle: StyleSheet {
+    private var listStyle: StyleSheet {
         var sheet = StyleSheet()
         sheet.id = "navigationBarList"
         sheet.set("none", for: "list-style-type")
@@ -23,24 +23,28 @@ public struct NavigationBar: Markup {
         return sheet
     }
     
-    public var listItemHoverStyle: StyleSheet {
+    private var listItemHoverStyle: StyleSheet {
         var sheet = StyleSheet()
         sheet.backgroundColor = .yellow
         return sheet
     }
     
+    private var listItemStyle: StyleSheet {
+        var sheet = StyleSheet()
+        sheet.id = "navigationBarListItem"
+        sheet.floatStrategy = .left
+        sheet.textColor = .white
+        sheet.padding = .init(left: 10, right: 10, top: 10, bottom: 10)
+        sheet.displayStyle = .block
+        sheet.hideTextDecoration = true
+        return sheet
+    }
+    
     public var body: some Markup {
         List {
-            content.map { markup in
-                var style = StyleSheet()
-                style.id = "navigationBarListItem"
-                style.floatStrategy = .left
-                style.textColor = .white
-                style.padding = .init(left: 10, right: 10, top: 10, bottom: 10)
-                style.displayStyle = .block
-                style.hideTextDecoration = true
-                return markup
-                    .style(style)
+            content.map {
+                $0
+                    .style(listItemStyle)
                     .style(variation: .onHover, listItemHoverStyle)
             }
         }
