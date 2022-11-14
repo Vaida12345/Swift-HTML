@@ -148,7 +148,6 @@ public struct StyleSheet {
         set { attributes["fontSize"] = newValue }
     }
     
-    /// The display style for the block. Maybe map to VSTack or HStack?
     public var displayStyle: DisplayStyle? {
         get { attributes["displayStyle"] as? DisplayStyle }
         set { attributes["displayStyle"] = newValue }

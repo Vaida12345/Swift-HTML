@@ -11,12 +11,19 @@ final class HTMLTests: XCTestCase {
         let renderer = Renderer()
         
         let document = Document(title: "1234") {
-            NavigationBar {
-                Text("1234")
-                    .onTapGesture(href: "1234")
-                
-                Text("5678")
-                    .onTapGesture(href: "5678")
+            ScrollMarkup(.horizontal) {
+                ScrollMarkup {
+                    NavigationBar {
+                        Text("1234")
+                            .onTapGesture(href: "1234")
+                        
+                        Text("5678")
+                            .onTapGesture(href: "5678")
+                    }
+                    
+                    Text("123456")
+                        .fontStyle(.heading1)
+                }
             }
         }
         

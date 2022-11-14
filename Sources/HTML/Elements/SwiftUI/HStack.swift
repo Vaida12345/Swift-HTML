@@ -14,7 +14,7 @@ public struct HStack: Markup {
     
     let alignment: Alignment
     
-    @MarkupBuilder let content: TupleMarkup
+    @MarkupBuilder let content: any Markup
     
     var style: StyleSheet {
         var sheet = StyleSheet()
@@ -31,7 +31,7 @@ public struct HStack: Markup {
         .inlineStyle(style)
     }
     
-    public init(alignment: Alignment = .center, @MarkupBuilder _ content: @escaping () -> TupleMarkup) {
+    public init(alignment: Alignment = .center, @MarkupBuilder _ content: @escaping () -> any Markup) {
         self.content = content()
         self.alignment = alignment
     }
