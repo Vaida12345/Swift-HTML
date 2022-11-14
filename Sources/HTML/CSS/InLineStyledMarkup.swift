@@ -40,4 +40,8 @@ public extension Markup {
         }
     }
     
+    internal func inlineStyle(_ style: StyleSheet) -> InLineStyledMarkup {
+        InLineStyledMarkup(style: style, source: self)
+    }
+    
 }

@@ -9,7 +9,7 @@
 /// A Markup created from a tuple of Markups.
 public struct TupleMarkup {
     
-    let components: [AnyMarkup]
+    internal let components: [AnyMarkup]
     
     private init(components: [AnyMarkup]) {
         self.components = components
@@ -86,6 +86,10 @@ public struct TupleMarkup {
         } else {
             self.init(components: [AnyMarkup(from: value)!])
         }
+    }
+    
+    internal func map(_ action: (AnyMarkup) -> AnyMarkup) -> TupleMarkup {
+        TupleMarkup(components: components.map(action))
     }
     
 }

@@ -10,19 +10,11 @@ final class HTMLTests: XCTestCase {
         
         let renderer = Renderer()
         
-        var style = StyleSheet()
-        style.borderStyle = .mixed(top: .none, right: .none, bottom: .none, left: .solid)
-        style.borderWidth = .medium
-        style.borderCornerRadius = 10
-        style.borderColor = .blue
-        style.backgroundColor = .blue.opacity(0.2)
-        style.padding = .init(left: 5, right: 5, top: 5, bottom: 5)
-        
-        let text = Text("123456")
-            .padding(.all, length: 5)
-            .border(.mixed(top: .none, right: .none, bottom: .none, left: .solid), color: .blue,width: .medium)
-            .cornerRadius(10)
-            .background(color: .blue.opacity(0.2))
+        let text = VStack {
+            Text("1234")
+            
+            Text("5678")
+        }
         
         print(renderer.render(text))
         

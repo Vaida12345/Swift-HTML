@@ -81,7 +81,7 @@ This is identical to
 ```Swift
 Text("123456")
     .padding(.all, length: 5)
-    .border(.mixed(top: .none, right: .none, bottom: .none, left: .solid), color: .blue,width: .medium)
+    .border(.mixed(top: .none, right: .none, bottom: .none, left: .solid), color: .blue, width: .medium)
     .cornerRadius(10)
     .background(color: .blue.opacity(0.2))
 ```

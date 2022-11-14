@@ -9,9 +9,9 @@
 /// A block-level logical division
 public struct Division {
     
-    let content: TupleMarkup
+    let content: any Markup
     
-    public init(@MarkupBuilder content: ()-> TupleMarkup) {
+    public init(@MarkupBuilder content: ()-> any Markup) {
         self.content = content()
     }
     

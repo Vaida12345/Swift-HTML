@@ -14,6 +14,8 @@ public struct StyleSheet {
     
     private var attributes: [String: Any] = [:]
     
+    internal var _attributes: [String: String] = [:]
+    
     /// The id can be modified to customize the link.
     ///
     /// This value should be rarely used / read, please see ``Markup/style(_:)``.
@@ -175,6 +177,11 @@ public struct StyleSheet {
         set { attributes["floatStrategy"] = newValue }
     }
     
+    public var alignment: Alignment? {
+        get { attributes["alignment"] as? Alignment }
+        set { attributes["alignment"] = newValue }
+    }
+    
     
     
     // MARK: - Instance Methods
@@ -182,6 +189,10 @@ public struct StyleSheet {
     /// Add the styles from `sheet`, keeping only contents of `sheet` under conflict.
     public mutating func addStyle(from sheet: StyleSheet) {
         self.attributes.merge(sheet.attributes, uniquingKeysWith: { (_, new) in new })
+    }
+    
+    internal mutating func set(_ value: String, for key: String) {
+        _attributes[key] = value
     }
     
     
@@ -385,6 +396,8 @@ public struct StyleSheet {
         
         /// Displays list items horizontally instead of vertically
         case inlineBlock = "inline-block"
+        
+        case flex
         
         internal var cssValue: String {
             self.rawValue

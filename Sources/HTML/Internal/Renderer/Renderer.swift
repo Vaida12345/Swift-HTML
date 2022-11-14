@@ -308,7 +308,7 @@ extension Renderer {
     }
     
     private func organize(styleSheet: StyleSheet) -> HTMLComponent {
-        var dictionary: [String: String] = [:]
+        var dictionary: [String: String] = styleSheet._attributes
         
         let cssColor = { (color: Color) in
             let color = color.animatableData
@@ -459,6 +459,30 @@ extension Renderer {
         if let value = styleSheet.overflowYStrategy  { dictionary["overflow-y"] = value.rawValue }
         
         if let value = styleSheet.floatStrategy      { dictionary["float"]      = value.rawValue }
+        
+        if let value = styleSheet.alignment {
+            switch value.horizontal {
+            case .leading:
+                dictionary["justify-content"] = "flex-start"
+            case .center:
+                dictionary["justify-content"] = "center"
+            case .trailing:
+                dictionary["justify-content"] = "flex-end"
+            default:
+                fatalError()
+            }
+            
+            switch value.vertical {
+            case .top:
+                dictionary["align-items"] = "flex-start"
+            case .center:
+                dictionary["align-items"] = "center"
+            case .bottom:
+                dictionary["align-items"] = "flex-end"
+            default:
+                fatalError()
+            }
+        }
         
         
         return .stratum(dictionary.map { .value("\($0.key): \($0.value);") })
