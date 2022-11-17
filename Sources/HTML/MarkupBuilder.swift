@@ -116,4 +116,8 @@
         component
     }
     
+    public static func buildArray(_ components: [any Component]) -> TupleMarkup {
+        TupleMarkup(components: components.map { AnyMarkup($0) })
+    }
+    
 }

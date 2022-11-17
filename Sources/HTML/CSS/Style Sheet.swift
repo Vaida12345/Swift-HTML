@@ -12,7 +12,7 @@ public struct StyleSheet {
     
     // MARK: - Basic Properties
     
-    private var attributes: [String: Any] = [:]
+    private var attributes: [String: any Equatable] = [:]
     
     internal var _attributes: [String: String] = [:]
     
@@ -205,10 +205,27 @@ public struct StyleSheet {
         _attributes[key] = value
     }
     
+    public func isStyleEqual(to rhs: StyleSheet) -> Bool {
+        guard self._attributes == rhs._attributes else { return false }
+        
+        func equates<LHS: Equatable, RHS>(lhs: LHS, rhs: RHS) -> Bool {
+            guard let rhs = rhs as? LHS else { return false }
+            
+            return lhs == rhs
+        }
+        
+        for (key, value) in self.attributes {
+            guard let rhs = rhs.attributes[key] else { return false }
+            return equates(lhs: value, rhs: rhs)
+        }
+        
+        return true
+    }
+    
     
     // MARK: - Designated Initializers
     
-    private init(attributes: [String : Any], _attributes: [String: String], id: String) {
+    private init(attributes: [String : any Equatable], _attributes: [String: String], id: String) {
         self.attributes = attributes
         self._attributes = _attributes
         self.id = id
@@ -236,7 +253,7 @@ public struct StyleSheet {
     //MARK: - Substructures
     
     /// The way the background image is repeated.
-    public enum BackgroundImageRepeatPolicy {
+    public enum BackgroundImageRepeatPolicy: Equatable {
         
         case repeatVertically
         
@@ -302,7 +319,7 @@ public struct StyleSheet {
     }
     
     
-    public indirect enum BorderWidth {
+    public indirect enum BorderWidth: Equatable {
         
         case thin
         
@@ -331,7 +348,7 @@ public struct StyleSheet {
         
     }
     
-    public struct EdgeInsets {
+    public struct EdgeInsets: Equatable {
         
         let left: Length?
         
@@ -374,7 +391,7 @@ public struct StyleSheet {
         internal var cssValue: String {
             switch self {
             case let .percentage(value):
-                return "\(value)%"
+                return "\(value * 100)%"
             case let .pixel(value):
                 return "\(value)px"
             }
@@ -382,7 +399,7 @@ public struct StyleSheet {
         
     }
     
-    public enum TextTransform {
+    public enum TextTransform: Equatable {
         
         case upperCased
         
@@ -407,7 +424,7 @@ public struct StyleSheet {
         
     }
     
-    public enum DisplayStyle: String {
+    public enum DisplayStyle: String, Equatable {
         
         case inline
         
@@ -425,7 +442,7 @@ public struct StyleSheet {
     }
     
     /// The position of the block.
-    public enum Position {
+    public enum Position: Equatable {
         
         /// The default position.
         ///

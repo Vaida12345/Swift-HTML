@@ -1,16 +1,15 @@
 //
-//  HStack.swift
+//  VGrid.swift
 //  
 //
-//  Created by Vaida on 11/14/22.
+//  Created by Vaida on 11/17/22.
 //
 
 
 import SwiftUI
 
 
-/// A horizontal stack.
-public struct HStack: Markup {
+public struct VGrid: Markup {
     
     let alignment: Alignment
     
@@ -21,22 +20,13 @@ public struct HStack: Markup {
         sheet.displayStyle = .flex
         sheet.alignment = alignment
         sheet.set("row", for: "flex-direction")
-        return sheet
-    }
-    
-    private var bodyGeneralStyle: StyleSheet {
-        var sheet = StyleSheet()
-        sheet.width = .percentage(1)
-        sheet.height = .percentage(1)
+        sheet.set("wrap", for: "flex-wrap")
         return sheet
     }
     
     public var body: some Markup {
         Division {
             content
-                .map {
-                    $0.addStyle(bodyGeneralStyle)
-                }
         }
         .inlineStyle(style)
     }

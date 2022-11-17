@@ -24,9 +24,19 @@ public struct VStack: Markup {
         return sheet
     }
     
+    private var bodyGeneralStyle: StyleSheet {
+        var sheet = StyleSheet()
+        sheet.width = .percentage(1)
+        sheet.height = .percentage(1)
+        return sheet
+    }
+    
     public var body: some Markup {
         Division {
             content
+                .map {
+                    $0.addStyle(bodyGeneralStyle)
+                }
         }
         .inlineStyle(style)
     }

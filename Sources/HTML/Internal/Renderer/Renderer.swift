@@ -264,11 +264,17 @@ extension Renderer {
             let base = content.source
             var baseComponents = organize(markup: base, styles: &styles, animations: &animations)
             
-            baseComponents.addAttribute(key: "class", value: "\"\(content.style.id)\"")
+            var classID = content.style.id
             
             if !styles.contains(where: { $0.id == content.style.id }) {
-                styles.append(content.style)
+                if let first = styles.first(where: { $0.isStyleEqual(to: content.style) }) {
+                    classID = first.id
+                } else {
+                    styles.append(content.style)
+                }
             }
+            
+            baseComponents.addAttribute(key: "class", value: "\"\(classID)\"")
             
             return baseComponents
         } else if let content = value as? VariedStyledMarkup {
@@ -347,6 +353,7 @@ extension Renderer {
     
     private func organize(styleSheet: StyleSheet) -> HTMLComponent {
         var dictionary: [String: String] = styleSheet._attributes
+        var additionalAttributes: [(key: String, value: String)] = []
         
         let cssColor = { (color: Color) in
             let color = color.animatableData
@@ -493,7 +500,7 @@ extension Renderer {
                 if let value = rect.left   { dictionary["left"]   = value.cssValue }
             case let .sticky(rect):
                 dictionary["position"] = "sticky"
-                dictionary["position"] = "-webkit-sticky"
+                additionalAttributes.append(("position", "-webkit-sticky"))
                 if let value = rect.top    { dictionary["top"]    = value.cssValue }
                 if let value = rect.right  { dictionary["right"]  = value.cssValue }
                 if let value = rect.bottom { dictionary["bottom"] = value.cssValue }
@@ -539,7 +546,7 @@ extension Renderer {
         if let value = styleSheet.transitionDuration { dictionary["transition"]      = value.description + "s" }
         
         
-        return .stratum(dictionary.map { .value("\($0.key): \($0.value);") })
+        return .stratum(dictionary.map { .value("\($0.key): \($0.value);")} + additionalAttributes.map { .value("\($0.key): \($0.value);") })
     }
     
     internal func render(_ value: HTMLComponent, level: Int = 0) -> String {

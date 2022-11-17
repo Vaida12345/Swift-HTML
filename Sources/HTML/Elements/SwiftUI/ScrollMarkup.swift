@@ -9,6 +9,9 @@
 import SwiftUI
 
 
+/// Make a block scrollable.
+///
+/// - Note: Do not wrap the whole body with a vertical scroll markup. As a webpage is scrollable by default.
 public struct ScrollMarkup: Markup {
     
     let axes: Axis.Set

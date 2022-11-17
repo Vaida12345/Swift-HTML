@@ -11,7 +11,7 @@ public struct TupleMarkup {
     
     internal let components: [AnyMarkup]
     
-    private init(components: [AnyMarkup]) {
+    internal init(components: [AnyMarkup]) {
         self.components = components
     }
     

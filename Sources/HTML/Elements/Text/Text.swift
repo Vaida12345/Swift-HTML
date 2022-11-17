@@ -71,6 +71,12 @@ public struct Text {
         Text(content: self.content, font: newValue)
     }
     
+    public func wrapText() -> some Markup {
+        var sheet = StyleSheet()
+        sheet.set("normal", for: "word-wrap")
+        return InLineStyledMarkup(style: sheet, source: self)
+    }
+    
 }
 
 

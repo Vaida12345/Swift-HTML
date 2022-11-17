@@ -8,7 +8,7 @@
 
 public struct NavigationBar: Markup {
     
-    let content: TupleMarkup
+    let content: any Markup
     
     let listItemHoverStyle: StyleSheet
     
@@ -70,11 +70,7 @@ public struct NavigationBar: Markup {
         .style(listStyle.with(style: userDefinedListStyle))
     }
     
-    public init(@MarkupBuilder _ content: () -> TupleMarkup) {
-        self.init(content: content())
-    }
-    
-    private init(content: TupleMarkup, listItemHoverStyle: StyleSheet? = nil, listStyle: StyleSheet? = nil, itemStyle: StyleSheet? = nil) {
+    private init(content:  any Markup, listItemHoverStyle: StyleSheet? = nil, listStyle: StyleSheet? = nil, itemStyle: StyleSheet? = nil) {
         self.content = content
         
         var sheet = StyleSheet()
@@ -84,6 +80,11 @@ public struct NavigationBar: Markup {
         self.userDefinedListStyle = listStyle
         self.userDefinedItemStyle = itemStyle
     }
+    
+    public init(@MarkupBuilder _ content: () -> any Markup) {
+        self.init(content: content())
+    }
+    
     
     public func onItemHover(_ result: (_ sheet: inout StyleSheet) -> ()) -> NavigationBar {
         var sheet = StyleSheet()
