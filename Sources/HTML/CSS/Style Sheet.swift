@@ -217,6 +217,7 @@ public struct StyleSheet {
     
     public func isStyleEqual(to rhs: StyleSheet) -> Bool {
         guard self._attributes == rhs._attributes else { return false }
+        guard self.attributes.keys.sorted() == rhs.attributes.keys.sorted() else { return false }
         
         func equates<LHS: Equatable, RHS>(lhs: LHS, rhs: RHS) -> Bool {
             guard let rhs = rhs as? LHS else { return false }
