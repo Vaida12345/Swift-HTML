@@ -22,6 +22,15 @@ final class HTMLTests: XCTestCase {
                                 .onTapGesture(href: "5678")
                         }
                     }
+                    .listStyle { sheet in
+                        sheet.backgroundColor = .gray
+                    }
+                    .onItemHover { sheet in
+                        sheet.backgroundColor = .green
+                    }
+                    .itemStyle { sheet in
+                        sheet.textColor = .green
+                    }
                     
                     Text("123456")
                         .fontStyle(.heading1)
@@ -30,7 +39,6 @@ final class HTMLTests: XCTestCase {
         }
         
         try! renderer.render(document).write(toFile: "\(NSHomeDirectory())/Desktop/untitled.html", atomically: true, encoding: .utf8)
-        
     }
 }
 

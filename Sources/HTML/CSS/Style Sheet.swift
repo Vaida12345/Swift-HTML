@@ -187,9 +187,18 @@ public struct StyleSheet {
     
     // MARK: - Instance Methods
     
-    /// Add the styles from `sheet`, keeping only contents of `sheet` under conflict.
+    /// Add the styles from `sheet`, keeping only new styles under conflict.
     public mutating func addStyle(from sheet: StyleSheet) {
         self.attributes.merge(sheet.attributes, uniquingKeysWith: { (_, new) in new })
+    }
+    
+    /// Add the styles from `sheet`, keeping only new styles under conflict.
+    public func with(style sheet: StyleSheet?) -> StyleSheet {
+        if let sheet {
+            return StyleSheet(attributes: self.attributes.merging(sheet.attributes, uniquingKeysWith: { (_, new) in new }), _attributes: _attributes, id: self.id)
+        } else {
+            return self
+        }
     }
     
     internal mutating func set(_ value: String, for key: String) {
@@ -199,8 +208,9 @@ public struct StyleSheet {
     
     // MARK: - Designated Initializers
     
-    private init(attributes: [String : Any], id: String) {
+    private init(attributes: [String : Any], _attributes: [String: String], id: String) {
         self.attributes = attributes
+        self._attributes = _attributes
         self.id = id
     }
     
@@ -208,7 +218,7 @@ public struct StyleSheet {
     // MARK: - Initializers
     
     init() {
-        self.init(attributes: [:], id: "i" + UUID().uuidString.replacingOccurrences(of: "-", with: "_"))
+        self.init(attributes: [:], _attributes: [:], id: "i" + UUID().uuidString.replacingOccurrences(of: "-", with: "_"))
     }
     
     // MARK: - Type Properties

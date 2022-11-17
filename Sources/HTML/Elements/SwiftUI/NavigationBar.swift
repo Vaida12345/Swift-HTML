@@ -12,6 +12,10 @@ public struct NavigationBar: Markup {
     
     let listItemHoverStyle: StyleSheet
     
+    let userDefinedListStyle: StyleSheet?
+    
+    let userDefinedItemStyle: StyleSheet?
+    
     private var listStyle: StyleSheet {
         var sheet = StyleSheet()
         sheet.id = "navigationBarList"
@@ -52,34 +56,54 @@ public struct NavigationBar: Markup {
             content.map {
                 if NavigationBarItem($0).placement == .leading {
                     return NavigationBarItem($0)
-                        .style(listItemStyleLeft)
+                        .style(listItemStyleLeft.with(style: userDefinedItemStyle))
                         .style(variation: .onHover, listItemHoverStyle)
                         .withTransition(duration: 0.25)
                 } else {
                     return NavigationBarItem($0)
-                        .style(listItemStyleRight)
+                        .style(listItemStyleRight.with(style: userDefinedItemStyle))
                         .style(variation: .onHover, listItemHoverStyle)
                         .withTransition(duration: 0.25)
                 }
             }
         }
-        .style(listStyle)
+        .style(listStyle.with(style: userDefinedListStyle))
     }
     
     public init(@MarkupBuilder _ content: () -> TupleMarkup) {
         self.init(content: content())
     }
     
-    private init(content: TupleMarkup, listItemHoverStyle: StyleSheet? = nil) {
+    private init(content: TupleMarkup, listItemHoverStyle: StyleSheet? = nil, listStyle: StyleSheet? = nil, itemStyle: StyleSheet? = nil) {
         self.content = content
         
         var sheet = StyleSheet()
         sheet.backgroundColor = .yellow
-        self.listItemHoverStyle = sheet
+        self.listItemHoverStyle = listItemHoverStyle ?? sheet
+        
+        self.userDefinedListStyle = listStyle
+        self.userDefinedItemStyle = itemStyle
     }
     
-    public func onItemHover(_ result: () -> StyleSheet) -> NavigationBar {
-        NavigationBar(content: self.content, listItemHoverStyle: result())
+    public func onItemHover(_ result: (_ sheet: inout StyleSheet) -> ()) -> NavigationBar {
+        var sheet = StyleSheet()
+        result(&sheet)
+        
+        return NavigationBar(content: self.content, listItemHoverStyle: sheet, listStyle: self.userDefinedListStyle, itemStyle: self.userDefinedItemStyle)
+    }
+    
+    public func listStyle(_ result: (_ sheet: inout StyleSheet) -> ()) -> NavigationBar {
+        var sheet = StyleSheet()
+        result(&sheet)
+        
+        return NavigationBar(content: self.content, listItemHoverStyle: self.listItemHoverStyle, listStyle: sheet, itemStyle: self.userDefinedItemStyle)
+    }
+    
+    public func itemStyle(_ result: (_ sheet: inout StyleSheet) -> ()) -> NavigationBar {
+        var sheet = StyleSheet()
+        result(&sheet)
+        
+        return NavigationBar(content: self.content, listItemHoverStyle: self.listItemHoverStyle, listStyle: self.userDefinedListStyle, itemStyle: sheet)
     }
     
 }

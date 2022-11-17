@@ -183,7 +183,7 @@ public extension Markup {
         return self.addStyle(sheet)
     }
     
-    /// Specifies the duration of any change made to current style.
+    /// Specifies the duration of any change made to *current markup*.
     func withTransition(duration: Double) -> some Markup {
         var sheet = StyleSheet()
         sheet.transitionDuration = duration
