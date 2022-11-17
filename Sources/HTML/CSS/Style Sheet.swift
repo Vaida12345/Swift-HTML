@@ -178,6 +178,11 @@ public struct StyleSheet {
         set { attributes["alignment"] = newValue }
     }
     
+    public var transitionDuration: Double? {
+        get { attributes["transitionDuration"] as? Double }
+        set { attributes["transitionDuration"] = newValue }
+    }
+    
     
     
     // MARK: - Instance Methods

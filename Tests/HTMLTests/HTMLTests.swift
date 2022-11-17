@@ -17,8 +17,10 @@ final class HTMLTests: XCTestCase {
                         Text("1234")
                             .onTapGesture(href: "1234")
                         
-                        Text("5678")
-                            .onTapGesture(href: "5678")
+                        NavigationBarItem(placement: .trailing) {
+                            Text("5678")
+                                .onTapGesture(href: "5678")
+                        }
                     }
                     
                     Text("123456")
@@ -27,7 +29,7 @@ final class HTMLTests: XCTestCase {
             }
         }
         
-        print(renderer.render(document))
+        try! renderer.render(document).write(toFile: "\(NSHomeDirectory())/Desktop/untitled.html", atomically: true, encoding: .utf8)
         
     }
 }
