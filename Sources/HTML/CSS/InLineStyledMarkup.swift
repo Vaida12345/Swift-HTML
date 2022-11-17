@@ -29,31 +29,19 @@ extension InLineStyledMarkup: Markup {
 
 public extension Markup {
     
-    internal func asType<T>(_: T.Type) -> T? {
-        if let content = self as? T {
-            return content
-        } else if let content = self as? AnyMarkup {
-            return content.content.asType(T.self)
-        } else if !(type(of: self).Body == Never.self), let content = self.body as? T {
-            return content
-        } else {
-            return nil
-        }
-    }
+//    internal func addStyle(_ source: StyleSheet) -> InLineStyledMarkup {
+//        if let content = self.asType(InLineStyledMarkup.self) {
+//            var styles = content.style
+//            styles.addStyle(from: source)
+//
+//            return InLineStyledMarkup(style: styles, source: content.source)
+//        } else {
+//            return InLineStyledMarkup(style: source, source: self)
+//        }
+//    }
     
-    internal func addStyle(_ source: StyleSheet) -> InLineStyledMarkup {
-        if let content = self.asType(InLineStyledMarkup.self) {
-            var styles = content.style
-            styles.addStyle(from: source)
-            
-            return InLineStyledMarkup(style: styles, source: content.source)
-        } else {
-            return InLineStyledMarkup(style: source, source: self)
-        }
-    }
-    
-    internal func inlineStyle(_ style: StyleSheet) -> InLineStyledMarkup {
-        InLineStyledMarkup(style: style, source: self)
-    }
+//    internal func inlineStyle(_ style: StyleSheet) -> InLineStyledMarkup {
+//        InLineStyledMarkup(style: style, source: self)
+//    }
     
 }

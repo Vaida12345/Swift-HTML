@@ -35,4 +35,15 @@ internal indirect enum HTMLComponent {
         }
     }
     
+    internal var attributes: [(key: String, value: String)] {
+        switch self {
+        case .regular(_, let attributes, _):
+            return attributes
+        case .regulars(_, let attributes, _):
+            return attributes
+        default:
+            return []
+        }
+    }
+    
 }

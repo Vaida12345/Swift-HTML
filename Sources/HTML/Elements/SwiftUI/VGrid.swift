@@ -28,7 +28,7 @@ public struct VGrid: Markup {
         Division {
             content
         }
-        .inlineStyle(style)
+        .addStyle(style)
     }
     
     public init(alignment: Alignment = .center, @MarkupBuilder _ content: @escaping () -> any Markup) {

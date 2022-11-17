@@ -75,8 +75,8 @@ public struct StyleSheet {
         set { attributes["borderWidth"] = newValue }
     }
     
-    public var borderCornerRadius: Int? {
-        get { attributes["borderCornerRadius"] as? Int }
+    public var borderCornerRadius: Length? {
+        get { attributes["borderCornerRadius"] as? Length }
         set { attributes["borderCornerRadius"] = newValue }
     }
     
@@ -181,6 +181,16 @@ public struct StyleSheet {
     public var transitionDuration: Double? {
         get { attributes["transitionDuration"] as? Double }
         set { attributes["transitionDuration"] = newValue }
+    }
+    
+    public var textShadow: Shadow? {
+        get { attributes["textShadow"] as? Shadow }
+        set { attributes["textShadow"] = newValue }
+    }
+    
+    public var boxShadow: Shadow? {
+        get { attributes["boxShadow"] as? Shadow }
+        set { attributes["boxShadow"] = newValue }
     }
     
     
@@ -491,6 +501,37 @@ public struct StyleSheet {
         
         /// The default value
         case none
+        
+    }
+    
+    public struct Shadow: Equatable {
+        
+        let color: Color
+        
+        let radius: Double
+        
+        let x: Double
+        
+        let y: Double
+        
+        
+        /// Creates a shadow.
+        ///
+        /// - Parameters:
+        ///   - color: The shadow's color.
+        ///   - radius: A measure of how much to blur the shadow. Larger values result in more blur.
+        ///   - x: An amount to offset the shadow horizontally from the view.
+        ///   - y: An amount to offset the shadow vertically from the view.
+        public init(color: Color = Color(.sRGBLinear, white: 0, opacity: 0.33), radius: Double, x: Double = 0, y: Double = 0) {
+            self.color = color
+            self.radius = radius
+            self.x = x
+            self.y = y
+        }
+        
+        internal var cssValue: String {
+            "\(x)px \(y)px \(radius)px \(color.cssColor)"
+        }
         
     }
     

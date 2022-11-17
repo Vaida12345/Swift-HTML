@@ -274,19 +274,17 @@ extension Renderer {
                 }
             }
             
-            baseComponents.addAttribute(key: "class", value: "\"\(classID)\"")
-            
-            return baseComponents
-        } else if let content = value as? VariedStyledMarkup {
-            let content = content
-            let base = content.base
-            var baseComponents = organize(markup: base, styles: &styles, animations: &animations)
-            
-            baseComponents.addAttribute(key: "class", value: "\"\(content.baseStyleID)\"")
-            
-            if !styles.contains(where: { $0.id == content.style.id }) {
-                styles.append(content.style)
+            for (variation, value) in content.variations {
+                var style = value
+                style.id = classID + ":" + variation.rawValue
+                
+                if !styles.contains(where: { $0.id == style.id }) {
+                    styles.append(style)
+                }
             }
+            
+            assert(!baseComponents.attributes.contains(where: { $0.key == "class" }))
+            baseComponents.addAttribute(key: "class", value: "\"\(classID)\"")
             
             return baseComponents
         } else if let content = value as? InLineStyledMarkup {
@@ -355,15 +353,6 @@ extension Renderer {
         var dictionary: [String: String] = styleSheet._attributes
         var additionalAttributes: [(key: String, value: String)] = []
         
-        let cssColor = { (color: Color) in
-            let color = color.animatableData
-            if color[3] == 1 {
-                return "rgb(\(Int(color[0] * 255)), \(Int(color[1] * 255)), \(Int(color[2] * 255)))"
-            } else {
-                return "rgba(\(Int(color[0] * 255)), \(Int(color[1] * 255)), \(Int(color[2] * 255)), \(color[3]))"
-            }
-        }
-        
         let cssAlignment = { (alignment: Alignment) in
             var horizontal: String {
                 switch alignment.horizontal {
@@ -394,9 +383,9 @@ extension Renderer {
             return horizontal + " " + vertical
         }
         
-        if let value = styleSheet.backgroundColor        { dictionary["background-color"]  = cssColor(value) }
-        if let value = styleSheet.textColor              { dictionary["color"]             = cssColor(value) }
-        if let value = styleSheet.borderColor            { dictionary["border-color"]      = cssColor(value) }
+        if let value = styleSheet.backgroundColor        { dictionary["background-color"]  = value.cssColor }
+        if let value = styleSheet.textColor              { dictionary["color"]             = value.cssColor }
+        if let value = styleSheet.borderColor            { dictionary["border-color"]      = value.cssColor }
         if let value = styleSheet.opacity                { dictionary["opacity"]           = value.description }
         
         if let value = styleSheet.backgroundImage        { dictionary["background-image"]  = "\"url(\(value))\"" }
@@ -415,7 +404,14 @@ extension Renderer {
         
         if let value = styleSheet.borderStyle            { dictionary["border-style"]  = value.cssValue }
         if let value = styleSheet.borderWidth            { dictionary["border-width"]  = value.cssValue }
-        if let value = styleSheet.borderCornerRadius     { dictionary["border-radius"] = value.description }
+        if let value = styleSheet.borderCornerRadius     {
+            switch value {
+            case let .percentage(value):
+                dictionary["border-radius"] = Int(value * 100).description + "vh"
+            case let .pixel(value):
+                dictionary["border-radius"] = value.description + "px"
+            }
+        }
         
         if let value = styleSheet.margin                 {
             if let value = value.allEqual() {
@@ -543,7 +539,10 @@ extension Renderer {
             }
         }
         
-        if let value = styleSheet.transitionDuration { dictionary["transition"]      = value.description + "s" }
+        if let value = styleSheet.transitionDuration { dictionary["transition"] = value.description + "s" }
+        
+        if let value = styleSheet.textShadow         { dictionary["text-shadow"] = value.cssValue }
+        if let value = styleSheet.boxShadow          { dictionary["box-shadow"] = value.cssValue }
         
         
         return .stratum(dictionary.map { .value("\($0.key): \($0.value);")} + additionalAttributes.map { .value("\($0.key): \($0.value);") })
@@ -610,6 +609,15 @@ internal extension Color {
         let color = UIColor(self).cgColor.converted(to: CGColorSpace(name: CGColorSpace.displayP3)!, intent: .defaultIntent, options: nil)!
         return color.components!.map { Double($0) } + [color.alpha]
 #endif
+    }
+    
+    var cssColor: String {
+        let color = self.animatableData
+        if color[3] == 1 {
+            return "rgb(\(Int(color[0] * 255)), \(Int(color[1] * 255)), \(Int(color[2] * 255)))"
+        } else {
+            return "rgba(\(Int(color[0] * 255)), \(Int(color[1] * 255)), \(Int(color[2] * 255)), \(color[3]))"
+        }
     }
     
 }

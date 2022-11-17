@@ -33,13 +33,18 @@ final class HTMLTests: XCTestCase {
                     VStack {
                         Image(source: "2.jpeg")
                             .padding(.all, length: .pixel(10))
-                            .cornerRadius(10)
+                            .cornerRadius(.percentage(0.05))
                         
                         Text(i.description + "AAAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAAA")
-                            .style(style)
+                            .addStyle(style)
                     }
                     .frame(width: .percentage(0.2), alignment: .none)
                     .padding(.all, length: .pixel(10))
+                    .withTransition(duration: 0.2)
+                    .onHover { sheet in
+                        sheet.boxShadow = .init(radius: 10)
+                        sheet.borderCornerRadius = .percentage(0.03)
+                    }
                 }
             }
         }
