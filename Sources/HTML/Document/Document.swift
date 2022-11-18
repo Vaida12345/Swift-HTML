@@ -17,14 +17,17 @@ public struct Document {
     
     let styles: [StyleSheet]
     
-    private init(content: any Markup, title: String?, styles: [StyleSheet]) {
+    let scripts: [SimpleScript]
+    
+    private init(content: any Markup, title: String?, styles: [StyleSheet], scripts: [SimpleScript]) {
         self.content = content
         self.styles = styles
         self.title = title
+        self.scripts = scripts
     }
     
     public init(title: String? = nil, @MarkupBuilder content: () -> any Markup) {
-        self.init(content: content(), title: title, styles: [])
+        self.init(content: content(), title: title, styles: [], scripts: [])
     }
     
     /// Explicitly link the document with a stylesheet.
@@ -33,7 +36,7 @@ public struct Document {
     ///
     /// - Note: This method should be rarely used, please see ``Markup/style(_:)``.
     private func with(style: StyleSheet) -> Document {
-        Document(content: self.content, title: self.title, styles: self.styles + [style])
+        Document(content: self.content, title: self.title, styles: self.styles + [style], scripts: self.scripts)
     }
     
 }

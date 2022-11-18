@@ -83,17 +83,29 @@ public extension Markup {
         }
     }
     
+    /// Adds another style to the current markup.
     internal func addStyle(_ source: StyleSheet, keepOriginalUnderConflict: Bool = false) -> StyledMarkup {
-        if let content = self.asType(StyledMarkup.self) {
+        let style = { (content: StyledMarkup) in
             if !keepOriginalUnderConflict {
-                var styles = content.style
-                styles.addStyle(from: source)
-                return StyledMarkup(style: styles, source: content.source, variations: content.variations)
+                var style = content.style
+                style.addStyle(from: source)
+                return style
             } else {
                 var style = source
                 style.addStyle(from: content.style)
-                return StyledMarkup(style: style, source: content.source, variations: content.variations)
+                return style
             }
+        }
+        
+        if let content = self.asType(AnyMarkup.self), let styledMarkup = content.content.asType(StyledMarkup.self) {
+            // self(AnyMarkup) -> StyledMarkup -> body
+            // => StyledMarkup -> self -> body
+            let body = styledMarkup.source
+            return StyledMarkup(style: style(styledMarkup), source: body, variations: styledMarkup.variations)
+        }
+        
+        if let content = self.asType(StyledMarkup.self) {
+            return StyledMarkup(style: style(content), source: content.source, variations: content.variations)
         } else {
             return StyledMarkup(style: source, source: self, variations: [:])
         }

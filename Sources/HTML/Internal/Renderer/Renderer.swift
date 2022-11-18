@@ -32,7 +32,8 @@ extension Renderer {
     public func render(_ value: some Markup) -> String {
         var styles: [StyleSheet] = []
         var animations: [Animation] = []
-        let result = self.render(self.organize(markup: value, styles: &styles, animations: &animations))
+        var scripts: [SimpleScript] = []
+        let result = self.render(self.organize(markup: value, styles: &styles, animations: &animations, scripts: &scripts))
         if !styles.isEmpty || !animations.isEmpty {
             print("Some styles were lost during rendering, please use Document instead.")
         }
@@ -42,25 +43,27 @@ extension Renderer {
     public func render(_ value: Document) -> String {
         var styles: [StyleSheet] = value.styles
         var animations: [Animation] = []
-        let body = self.organize(markup: value.content, styles: &styles, animations: &animations)
+        var scripts: [SimpleScript] = []
+        let body = self.organize(markup: value.content, styles: &styles, animations: &animations, scripts: &scripts)
         
         let component = HTMLComponent.stratum([
             .regular(node: "!DOCTYPE html", content: .empty),
-            .regulars(node: "html", contents: [
-                .regulars(node: "head", contents:
-                            (value.title != nil ? [.regular(node: "title", content: .value(value.title!))] : []) +
-                          [
-                            .regular(node: "style", content: .stratum(
-                                styles.map { .contained(lhs: "." + $0.id + " {", rhs: "}", content: organize(styleSheet: $0)) }
-                                +
-                                animations.map {
-                                    HTMLComponent.contained(lhs: "@keyframes " + $0.name + " {", rhs: "}",
-                                                            content:  .contained(lhs: "to {", rhs: "}", content: organize(styleSheet: $0.destination)))
-                                }
-                            ))
-                          ]),
-                .regular(node: "body", content: body)
-            ])
+            .value("<html>"),
+            .regulars(node: "head", contents:
+                        (value.title != nil ? [.regular(node: "title", content: .value(value.title!))] : []) +
+                      [
+                        .regular(node: "style", content: .stratum(
+                            styles.map { .contained(lhs: "." + $0.id + " {", rhs: "}", content: organize(styleSheet: $0)) }
+                            +
+                            animations.map {
+                                HTMLComponent.contained(lhs: "@keyframes " + $0.name + " {", rhs: "}",
+                                                        content:  .contained(lhs: "to {", rhs: "}", content: organize(styleSheet: $0.destination)))
+                            }
+                        ))
+                      ]),
+            .regular(node: "body", content: body),
+            .regulars(node: "script", contents: scripts.map(\.body)),
+            .value("</html>"),
         ])
         
         return self.render(component)
@@ -70,7 +73,7 @@ extension Renderer {
         self.render(self.organize(styleSheet: value))
     }
     
-    private func organize(markup value: some Markup, styles: inout [StyleSheet], animations: inout [Animation]) -> HTMLComponent {
+    private func organize(markup value: some Markup, styles: inout [StyleSheet], animations: inout [Animation], scripts: inout [SimpleScript]) -> HTMLComponent {
         if let content = value as? Text {
             var node: String {
                 switch content.font {
@@ -102,11 +105,11 @@ extension Renderer {
                 ]
             })
         } else if let content = value as? AnyMarkup {
-            return self.organize(markup: content.content, styles: &styles, animations: &animations)
+            return self.organize(markup: content.content, styles: &styles, animations: &animations, scripts: &scripts)
         } else if value is EmptyMarkup {
             return .empty
         } else if let content = value as? TupleMarkup {
-            return .stratum(content.components.map { organize(markup: $0, styles: &styles, animations: &animations) })
+            return .stratum(content.components.map { organize(markup: $0, styles: &styles, animations: &animations, scripts: &scripts) })
         } else if let content = value as? List {
             switch content.style {
             case let .ordered(isReversed, startValue, indexStyle):
@@ -129,12 +132,12 @@ extension Renderer {
                 if let start = startValue, start != 1 { attributes.append(("start", start.description)) }
                 if isReversed { attributes.append(("reversed", "")) }
                 
-                return .regular(node: "ol", attributes: attributes, content: organize(markup: content.contents, styles: &styles, animations: &animations))
+                return .regular(node: "ol", attributes: attributes, content: organize(markup: content.contents, styles: &styles, animations: &animations, scripts: &scripts))
             case .unordered:
-                return .regular(node: "ul", content: organize(markup: content.contents, styles: &styles, animations: &animations))
+                return .regular(node: "ul", content: organize(markup: content.contents, styles: &styles, animations: &animations, scripts: &scripts))
             }
         } else if let content = value as? WrappedMarkup {
-            return .regular(node: content.node, content: self.organize(markup: content.content, styles: &styles, animations: &animations))
+            return .regular(node: content.node, content: self.organize(markup: content.content, styles: &styles, animations: &animations, scripts: &scripts))
         } else if let content = value as? Image {
             // render the image first, then the figure
             var attributes: [(key: String, value: String)] = []
@@ -154,11 +157,11 @@ extension Renderer {
                 return .regular(node: "img", attributes: attributes, content: .empty)
             }
         } else if let content = value as? Division {
-            return .regular(node: "div", content: self.organize(markup: content.content, styles: &styles, animations: &animations))
+            return .regular(node: "div", content: self.organize(markup: content.content, styles: &styles, animations: &animations, scripts: &scripts))
         } else if value is Divider {
             return .regular(node: "hr", content: .empty)
         } else if let content = value as? Section {
-            return .regular(node: "section", content: self.organize(markup: content.content, styles: &styles, animations: &animations))
+            return .regular(node: "section", content: self.organize(markup: content.content, styles: &styles, animations: &animations, scripts: &scripts))
         } else if let content = value as? Script {
             var attributes: [(key: String, value: String)] = []
             if let value = content.source { attributes.append(("src",  "\"\(value)\"")) }
@@ -186,7 +189,7 @@ extension Renderer {
                 if let base = content.base as? Text, let content = base.content as? String {
                     return .regular(node: "a", attributes: attributes, content: .value(content))
                 } else {
-                    return .regular(node: "a", attributes: attributes, content: organize(markup: content.base, styles: &styles, animations: &animations))
+                    return .regular(node: "a", attributes: attributes, content: organize(markup: content.base, styles: &styles, animations: &animations, scripts: &scripts))
                 }
             } else {
                 var base = content.base
@@ -198,7 +201,7 @@ extension Renderer {
                 }
                 
                 let id = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-                var baseComponent = organize(markup: base, styles: &styles, animations: &animations)
+                var baseComponent = organize(markup: base, styles: &styles, animations: &animations, scripts: &scripts)
                 baseComponent.addAttribute(key: "usemap", value: "\"" + "#" + id + "\"")
                 
                 return .stratum([
@@ -249,21 +252,21 @@ extension Renderer {
             ])
         } else if let content = value as? EventMarkup {
             let base = content.source
-            var baseComponents = organize(markup: base, styles: &styles, animations: &animations)
+            var baseComponents = organize(markup: base, styles: &styles, animations: &animations, scripts: &scripts)
             
             baseComponents.addAttribute(key: content.eventName, value: "\"\(content.action)\"")
             
             return baseComponents
         } else if let content = value as? BoolAttributeMarkup {
             let base = content.source
-            var baseComponents = organize(markup: base, styles: &styles, animations: &animations)
+            var baseComponents = organize(markup: base, styles: &styles, animations: &animations, scripts: &scripts)
             
             baseComponents.addAttribute(key: content.nodeName, value: nil)
             
             return baseComponents
         } else if let content = value as? StyledMarkup {
             let base = content.source
-            var baseComponents = organize(markup: base, styles: &styles, animations: &animations)
+            var baseComponents = organize(markup: base, styles: &styles, animations: &animations, scripts: &scripts)
             
             var classID = content.style.id
             
@@ -290,14 +293,14 @@ extension Renderer {
             return baseComponents
         } else if let content = value as? InLineStyledMarkup {
             let base = content.source
-            var baseComponents = organize(markup: base, styles: &styles, animations: &animations)
+            var baseComponents = organize(markup: base, styles: &styles, animations: &animations, scripts: &scripts)
             
             baseComponents.addAttribute(key: "style", value: "\"\(render(organize(styleSheet: content.style)).replacingOccurrences(of: "\n", with: " "))\"")
             
             return baseComponents
         } else if let content = value as? AnimatedMarkup {
             let base = content.source
-            var baseComponents = organize(markup: base, styles: &styles, animations: &animations)
+            var baseComponents = organize(markup: base, styles: &styles, animations: &animations, scripts: &scripts)
             
             baseComponents.addAttribute(key: "animation-name", value: content.animation.name)
             baseComponents.addAttribute(key: "animation-duration", value: content.animation.duration.description + "s")
@@ -305,10 +308,17 @@ extension Renderer {
             animations.append(content.animation)
             
             return baseComponents
+        } else if let content = value as? ScriptedMarkup {
+            let base = content.base
+            var baseComponents = organize(markup: base, styles: &styles, animations: &animations, scripts: &scripts)
+            scripts.append(content.script)
+            baseComponents.addAttribute(key: "onclick", value: "\"\(content.script.rawValue)()\"")
+            
+            return baseComponents
         }
         
         assert(!(value.body is Never))
-        return self.organize(markup: value.body, styles: &styles, animations: &animations)
+        return self.organize(markup: value.body, styles: &styles, animations: &animations, scripts: &scripts)
     }
     
     private func organize(text value: some AttributedText) -> HTMLComponent {

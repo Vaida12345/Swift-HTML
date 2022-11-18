@@ -37,6 +37,7 @@ public struct NavigationBar: Markup {
         sheet.padding = .init(left: 10, right: 10, top: 10, bottom: 10)
         sheet.displayStyle = .block
         sheet.hideTextDecoration = true
+        sheet.margin = .init(left: 0, right: 0, top: 0, bottom: 0)
         return sheet
     }
     
@@ -56,12 +57,12 @@ public struct NavigationBar: Markup {
             content.map {
                 if NavigationBarItem($0).placement == .leading {
                     return NavigationBarItem($0)
-                        .style(listItemStyleLeft.with(style: userDefinedItemStyle))
+                        .addStyle(listItemStyleLeft.with(style: userDefinedItemStyle))
                         .style(variation: .onHover, listItemHoverStyle)
                         .withTransition(duration: 0.25)
                 } else {
                     return NavigationBarItem($0)
-                        .style(listItemStyleRight.with(style: userDefinedItemStyle))
+                        .addStyle(listItemStyleRight.with(style: userDefinedItemStyle))
                         .style(variation: .onHover, listItemHoverStyle)
                         .withTransition(duration: 0.25)
                 }

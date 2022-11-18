@@ -18,8 +18,9 @@ final class HTMLTests: XCTestCase {
         
         let document = Document(title: "1234") {
             NavigationBar {
-                Text("1234")
-                    .onTapGesture(href: "1234")
+                Text("Top")
+                    .onTapGesture(.scrollToTop)
+                    .frame(height: .percentage(1))
             }
             .listStyle { sheet in
                 sheet.backgroundColor = .gray
