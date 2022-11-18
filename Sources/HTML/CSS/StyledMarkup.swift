@@ -6,6 +6,9 @@
 //
 
 
+/// A markup that has a css style.
+///
+/// - Note: You do not create instances directly, try ``Markup/style(_:)``, or anything similar to SwiftUI.
 public struct StyledMarkup {
     
     let style: StyleSheet
@@ -53,6 +56,9 @@ extension StyledMarkup: Markup {
 
 public extension StyledMarkup {
     
+    /// Change the style on hover.
+    ///
+    /// - Note: As this is considered as a style variation, it can only be applied to ``StyledMarkup``. Try ``Markup/style(_:)`` or ``Markup/styled()``
     func onHover(_ result: (_ sheet: inout StyleSheet) -> ()) -> StyledMarkup {
         var sheet = StyleSheet()
         result(&sheet)
@@ -77,12 +83,17 @@ public extension Markup {
         }
     }
     
-    internal func addStyle(_ source: StyleSheet) -> StyledMarkup {
+    internal func addStyle(_ source: StyleSheet, keepOriginalUnderConflict: Bool = false) -> StyledMarkup {
         if let content = self.asType(StyledMarkup.self) {
-            var styles = content.style
-            styles.addStyle(from: source)
-            
-            return StyledMarkup(style: styles, source: content.source, variations: content.variations)
+            if !keepOriginalUnderConflict {
+                var styles = content.style
+                styles.addStyle(from: source)
+                return StyledMarkup(style: styles, source: content.source, variations: content.variations)
+            } else {
+                var style = source
+                style.addStyle(from: content.style)
+                return StyledMarkup(style: style, source: content.source, variations: content.variations)
+            }
         } else {
             return StyledMarkup(style: source, source: self, variations: [:])
         }
@@ -91,6 +102,17 @@ public extension Markup {
     
     func style(_ source: StyleSheet) -> StyledMarkup {
         self.addStyle(source)
+    }
+    
+    /// Apply an empty style to the markup.
+    ///
+    /// - Note: Apply this method to markups that are already styled has no effect.
+    func styled() -> StyledMarkup {
+        if let content = self.asType(StyledMarkup.self) {
+            return content
+        } else {
+            return self.addStyle(StyleSheet())
+        }
     }
     
 }

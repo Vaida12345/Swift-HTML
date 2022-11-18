@@ -26,6 +26,7 @@ public struct VStack: Markup {
     
     private var bodyGeneralStyle: StyleSheet {
         var sheet = StyleSheet()
+        sheet.id = "stackItemGeneralStyle"
         sheet.width = .percentage(1)
         sheet.height = .percentage(1)
         return sheet
@@ -35,7 +36,11 @@ public struct VStack: Markup {
         Division {
             content
                 .map {
-                    $0.addStyle(bodyGeneralStyle)
+                    if let content = $0.asType(StyledMarkup.self), !content.style.hasFrameConstrains {
+                        return $0
+                    } else {
+                        return $0.addStyle(bodyGeneralStyle)
+                    }
                 }
         }
         .addStyle(style)

@@ -20,7 +20,7 @@ public struct Renderer {
     ///
     /// - Parameters:
     ///   - indentation: The indentation used.
-    init(indentation: String = "    ") {
+    public init(indentation: String = "    ") {
         self.indentation = indentation
     }
     
@@ -47,17 +47,18 @@ extension Renderer {
         let component = HTMLComponent.stratum([
             .regular(node: "!DOCTYPE html", content: .empty),
             .regulars(node: "html", contents: [
-                .regulars(node: "head", contents: [
-                    .regular(node: "title", content: .value(value.title)),
-                    .regular(node: "style", content: .stratum(
-                        styles.map { .contained(lhs: "." + $0.id + " {", rhs: "}", content: organize(styleSheet: $0)) }
-                        +
-                        animations.map {
-                            HTMLComponent.contained(lhs: "@keyframes " + $0.name + " {", rhs: "}",
-                                                    content:  .contained(lhs: "to {", rhs: "}", content: organize(styleSheet: $0.destination)))
-                        }
-                    ))
-                ]),
+                .regulars(node: "head", contents:
+                            (value.title != nil ? [.regular(node: "title", content: .value(value.title!))] : []) +
+                          [
+                            .regular(node: "style", content: .stratum(
+                                styles.map { .contained(lhs: "." + $0.id + " {", rhs: "}", content: organize(styleSheet: $0)) }
+                                +
+                                animations.map {
+                                    HTMLComponent.contained(lhs: "@keyframes " + $0.name + " {", rhs: "}",
+                                                            content:  .contained(lhs: "to {", rhs: "}", content: organize(styleSheet: $0.destination)))
+                                }
+                            ))
+                          ]),
                 .regular(node: "body", content: body)
             ])
         ])

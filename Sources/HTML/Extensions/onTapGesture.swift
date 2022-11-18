@@ -93,7 +93,14 @@ public extension Markup {
         TapedStateMarkup(base: self, kind: .anchor, downloadFile: downloadFile, type: type)
     }
     
-    /// Response to user interact when taped.
+    /// Response to user interact when taped by opening the file defined in `href`.
+    ///
+    /// To hide that underline and change the text color, try ``Markup/hideTextDecoration()`` and ``Markup/foregroundColor(_:)``
+    /// ```Swift
+    /// .onTapGesture(href: "Untitled.html")
+    /// .hideTextDecoration()
+    /// .foregroundColor(.black)
+    /// ```
     ///
     /// - Parameters:
     ///   - href: The hyperlink target

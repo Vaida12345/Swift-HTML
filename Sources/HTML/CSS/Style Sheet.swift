@@ -193,6 +193,14 @@ public struct StyleSheet {
         set { attributes["boxShadow"] = newValue }
     }
     
+    internal var hasFrameConstrains: Bool {
+        self.width == nil &&
+        self.height == nil &&
+        self.maxWidth == nil &&
+        self.maxHeight == nil &&
+        self.minWidth == nil &&
+        self.minHeight == nil
+    }
     
     
     // MARK: - Instance Methods

@@ -126,7 +126,7 @@ public extension Markup {
         return self.addStyle(sheet)
     }
     
-    func frame(minWidth: StyleSheet.Length? = nil, width: StyleSheet.Length? = nil, maxWidth: StyleSheet.Length? = nil, minHeight: StyleSheet.Length? = nil, height: StyleSheet.Length? = nil, maxHeight: StyleSheet.Length? = nil, alignment: StyleSheet.FloatStrategy) -> StyledMarkup {
+    func frame(minWidth: StyleSheet.Length? = nil, width: StyleSheet.Length? = nil, maxWidth: StyleSheet.Length? = nil, minHeight: StyleSheet.Length? = nil, height: StyleSheet.Length? = nil, maxHeight: StyleSheet.Length? = nil, alignment: StyleSheet.FloatStrategy = .none) -> StyledMarkup {
         var sheet = StyleSheet()
         sheet.minWidth = minWidth
         sheet.width = width
