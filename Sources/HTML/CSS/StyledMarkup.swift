@@ -13,35 +13,19 @@ public struct StyledMarkup {
     
     let style: StyleSheet
     
+    let additionalStyles: [StyleSheet]
+    
     let source: any Markup
     
-    let variations: [Variation: StyleSheet]
-    
-    init(style: StyleSheet, source: any Markup, variations: [Variation: StyleSheet]) {
+    init(style: StyleSheet, source: any Markup, additionalStyles: [StyleSheet]) {
         self.style = style
         self.source = source
-        self.variations = variations
+        self.additionalStyles = additionalStyles
     }
     
     /// Adds an variation to the style.
-    public func style(variation: Variation, _ source: StyleSheet) -> StyledMarkup {
-        var dictionary = self.variations
-        if dictionary[variation] != nil {
-            dictionary[variation]!.addStyle(from: source)
-        } else {
-            dictionary[variation] = source
-        }
-        
-        return StyledMarkup(style: self.style, source: self.source, variations: dictionary)
-    }
-    
-    public enum Variation: String, Hashable {
-        
-        /// The variation when the link is active.
-        case active
-        
-        case onHover = "hover"
-        
+    public func style(variation: StyleSheet.Variation, _ source: StyleSheet) -> StyledMarkup {
+        StyledMarkup(style: self.style.style(variation: variation, source), source: self.source, additionalStyles: self.additionalStyles)
     }
     
 }
@@ -84,30 +68,52 @@ public extension Markup {
     }
     
     /// Adds another style to the current markup.
-    internal func addStyle(_ source: StyleSheet, keepOriginalUnderConflict: Bool = false) -> StyledMarkup {
-        let style = { (content: StyledMarkup) in
-            if !keepOriginalUnderConflict {
-                var style = content.style
-                style.addStyle(from: source)
-                return style
-            } else {
-                var style = source
-                style.addStyle(from: content.style)
-                return style
+    ///
+    /// - Parameters:
+    ///   - source: The added style.
+    ///   - keepOriginalUnderConflict: Whether the original style should be kept under conflict.
+    ///   - keepSeparate: Use the style as a separate style.
+    internal func addStyle(_ source: StyleSheet?, keepOriginalUnderConflict: Bool = false, keepSeparate: Bool = false) -> StyledMarkup {
+        guard let source else { return self.asType(StyledMarkup.self) ?? self.styled() }
+        
+        if keepSeparate {
+            if let content = self.asType(AnyMarkup.self), let styledMarkup = content.content.asType(StyledMarkup.self) {
+                // self(AnyMarkup) -> StyledMarkup -> body
+                // => StyledMarkup -> self -> body
+                let body = styledMarkup.source
+                return StyledMarkup(style: styledMarkup.style, source: body, additionalStyles: styledMarkup.additionalStyles + [source])
             }
-        }
-        
-        if let content = self.asType(AnyMarkup.self), let styledMarkup = content.content.asType(StyledMarkup.self) {
-            // self(AnyMarkup) -> StyledMarkup -> body
-            // => StyledMarkup -> self -> body
-            let body = styledMarkup.source
-            return StyledMarkup(style: style(styledMarkup), source: body, variations: styledMarkup.variations)
-        }
-        
-        if let content = self.asType(StyledMarkup.self) {
-            return StyledMarkup(style: style(content), source: content.source, variations: content.variations)
+            
+            if let content = self.asType(StyledMarkup.self) {
+                return StyledMarkup(style: content.style, source: content.source, additionalStyles: content.additionalStyles + [source])
+            } else {
+                return StyledMarkup(style: source, source: self, additionalStyles: [])
+            }
         } else {
-            return StyledMarkup(style: source, source: self, variations: [:])
+            let style = { (content: StyledMarkup) in
+                if !keepOriginalUnderConflict {
+                    var style = content.style
+                    style.addStyle(from: source)
+                    return style
+                } else {
+                    var style = source
+                    style.addStyle(from: content.style)
+                    return style
+                }
+            }
+            
+            if let content = self.asType(AnyMarkup.self), let styledMarkup = content.content.asType(StyledMarkup.self) {
+                // self(AnyMarkup) -> StyledMarkup -> body
+                // => StyledMarkup -> self -> body
+                let body = styledMarkup.source
+                return StyledMarkup(style: style(styledMarkup), source: body, additionalStyles: styledMarkup.additionalStyles)
+            }
+            
+            if let content = self.asType(StyledMarkup.self) {
+                return StyledMarkup(style: style(content), source: content.source, additionalStyles: content.additionalStyles)
+            } else {
+                return StyledMarkup(style: source, source: self, additionalStyles: [])
+            }
         }
     }
     

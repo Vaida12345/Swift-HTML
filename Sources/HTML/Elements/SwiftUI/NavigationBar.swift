@@ -57,12 +57,14 @@ public struct NavigationBar: Markup {
             content.map {
                 if NavigationBarItem($0).placement == .leading {
                     return NavigationBarItem($0)
-                        .addStyle(listItemStyleLeft.with(style: userDefinedItemStyle))
+                        .addStyle(listItemStyleLeft)
+                        .addStyle(userDefinedItemStyle, keepSeparate: true)
                         .style(variation: .onHover, listItemHoverStyle)
                         .withTransition(duration: 0.25)
                 } else {
                     return NavigationBarItem($0)
-                        .addStyle(listItemStyleRight.with(style: userDefinedItemStyle))
+                        .addStyle(listItemStyleRight)
+                        .addStyle(userDefinedItemStyle, keepSeparate: true)
                         .style(variation: .onHover, listItemHoverStyle)
                         .withTransition(duration: 0.25)
                 }

@@ -14,12 +14,18 @@ public struct StyleSheet {
     
     private var attributes: [String: any Equatable] = [:]
     
+    /// The internal only attributes that can be directly turned into css.
     internal var _attributes: [String: String] = [:]
     
     /// The id can be modified to customize the link.
     ///
     /// This value should be rarely used / read, please see ``Markup/style(_:)``.
     public var id: String
+    
+    /// The variations on the style
+    ///
+    /// - Important: The id of variations stands for nothing
+    var variations: [Variation: StyleSheet]
     
     
     // MARK: - Instance Properties
@@ -213,7 +219,7 @@ public struct StyleSheet {
     /// Add the styles from `sheet`, keeping only new styles under conflict.
     public func with(style sheet: StyleSheet?) -> StyleSheet {
         if let sheet {
-            return StyleSheet(attributes: self.attributes.merging(sheet.attributes, uniquingKeysWith: { (_, new) in new }), _attributes: _attributes, id: self.id)
+            return StyleSheet(attributes: self.attributes.merging(sheet.attributes, uniquingKeysWith: { (_, new) in new }), _attributes: _attributes, id: self.id, variations: self.variations)
         } else {
             return self
         }
@@ -226,6 +232,13 @@ public struct StyleSheet {
     public func isStyleEqual(to rhs: StyleSheet) -> Bool {
         guard self._attributes == rhs._attributes else { return false }
         guard self.attributes.keys.sorted() == rhs.attributes.keys.sorted() else { return false }
+        guard self.variations.keys.sorted() == rhs.variations.keys.sorted() else { return false }
+        
+        for (key, value) in self.variations {
+            guard let rhs = rhs.variations[key] else { return false }
+            guard value.isStyleEqual(to: rhs) else { return false }
+        }
+        
         
         func equates<LHS: Equatable, RHS>(lhs: LHS, rhs: RHS) -> Bool {
             guard let rhs = rhs as? LHS else { return false }
@@ -241,20 +254,33 @@ public struct StyleSheet {
         return true
     }
     
+    /// Adds an variation to the style.
+    public func style(variation: Variation, _ source: StyleSheet) -> StyleSheet {
+        var dictionary = self.variations
+        if dictionary[variation] != nil {
+            dictionary[variation]!.addStyle(from: source)
+        } else {
+            dictionary[variation] = source
+        }
+        
+        return StyleSheet(attributes: self.attributes, _attributes: self._attributes, id: self.id, variations: dictionary)
+    }
+    
     
     // MARK: - Designated Initializers
     
-    private init(attributes: [String : any Equatable], _attributes: [String: String], id: String) {
+    private init(attributes: [String : any Equatable], _attributes: [String: String], id: String, variations: [Variation: StyleSheet]) {
         self.attributes = attributes
         self._attributes = _attributes
         self.id = id
+        self.variations = variations
     }
     
     
     // MARK: - Initializers
     
     init() {
-        self.init(attributes: [:], _attributes: [:], id: "i" + UUID().uuidString.replacingOccurrences(of: "-", with: "_"))
+        self.init(attributes: [:], _attributes: [:], id: "i" + UUID().uuidString.replacingOccurrences(of: "-", with: "_"), variations: [:])
     }
     
     // MARK: - Type Properties
@@ -542,6 +568,18 @@ public struct StyleSheet {
             "\(x)px \(y)px \(radius)px \(color.cssColor)"
         }
         
+    }
+    
+    public enum Variation: String, Hashable, Comparable {
+        
+        /// The variation when the link is active.
+        case active
+        
+        case onHover = "hover"
+        
+        public static func < (lhs: StyleSheet.Variation, rhs: StyleSheet.Variation) -> Bool {
+            lhs.rawValue < rhs.rawValue
+        }
     }
     
     

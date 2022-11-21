@@ -268,27 +268,27 @@ extension Renderer {
             let base = content.source
             var baseComponents = organize(markup: base, styles: &styles, animations: &animations, scripts: &scripts)
             
-            var classID = content.style.id
+            let allStyles = [content.style] + content.additionalStyles
+            var allIDs = allStyles.map(\.id)
             
-            if !styles.contains(where: { $0.id == content.style.id }) {
-                if let first = styles.first(where: { $0.isStyleEqual(to: content.style) }) {
-                    classID = first.id
-                } else {
-                    styles.append(content.style)
-                }
-            }
-            
-            for (variation, value) in content.variations {
-                var style = value
-                style.id = classID + ":" + variation.rawValue
-                
-                if !styles.contains(where: { $0.id == style.id }) {
-                    styles.append(style)
+            for i in 0..<allStyles.count {
+                if !styles.contains(where: { $0.id == allStyles[i].id }) {
+                    if let first = styles.first(where: { $0.isStyleEqual(to: allStyles[i]) }) {
+                        allIDs[i] = first.id
+                    } else {
+                        styles.append(allStyles[i])
+                        
+                        for (variation, value) in allStyles[i].variations {
+                            var style = value
+                            style.id = content.style.id + ":" + variation.rawValue
+                            styles.append(style)
+                        }
+                    }
                 }
             }
             
             assert(!baseComponents.attributes.contains(where: { $0.key == "class" }))
-            baseComponents.addAttribute(key: "class", value: "\"\(classID)\"")
+            baseComponents.addAttribute(key: "class", value: "\"\(allIDs.joined(separator: " "))\"")
             
             return baseComponents
         } else if let content = value as? InLineStyledMarkup {

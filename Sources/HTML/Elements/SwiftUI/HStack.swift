@@ -39,7 +39,7 @@ public struct HStack: Markup {
                     if let content = $0.asType(StyledMarkup.self), !content.style.hasFrameConstrains {
                         return $0
                     } else {
-                        return $0.addStyle(bodyGeneralStyle)
+                        return $0.addStyle(bodyGeneralStyle, keepSeparate: true)
                     }
                 }
         }

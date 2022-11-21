@@ -55,44 +55,8 @@ final class HTMLTests: XCTestCase {
             }
         }
         
-        let secondDocument = Document {
-            HStack {
-                Image(source: "2.jpeg")
-                    .padding(.all, length: .pixel(10))
-                    .cornerRadius(.percentage(0.05))
-                    .frame(maxHeight: 500)
-                
-                VStack {
-                    Text("Some awesome title")
-                        .fontStyle(.heading1)
-                    Text("12345")
-                    Text("12345")
-                    Text("12345")
-                    Text("12345")
-                    Text("12345")
-                    Text("12345")
-                }
-            }
-            
-            NavigationBar {
-                Text("Go back")
-                    .onTapGesture(href: "untitled.html")
-            }
-            .cornerRadius(.percentage(0.01))
-            
-            for i in 1...10 {
-                VStack {
-                    Image(source: "2.jpeg")
-                        .padding(.all, length: .pixel(10))
-                        .cornerRadius(.percentage(0.05))
-                    
-                    Text(i.description + "AAAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAAA")
-                }
-            }
-        }
         
         try! renderer.render(document).write(toFile: "\(NSHomeDirectory())/Desktop/untitled.html", atomically: true, encoding: .utf8)
-        try! renderer.render(secondDocument).write(toFile: "\(NSHomeDirectory())/Desktop/untitled 2.html", atomically: true, encoding: .utf8)
     }
 }
 
