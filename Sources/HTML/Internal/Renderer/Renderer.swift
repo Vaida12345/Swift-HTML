@@ -53,7 +53,7 @@ extension Renderer {
                         (value.title != nil ? [.regular(node: "title", content: .value(value.title!))] : []) +
                       [
                         .regular(node: "style", content: .stratum(
-                            styles.map { .contained(lhs: "." + $0.id + " {", rhs: "}", content: organize(styleSheet: $0)) }
+                            styles.map { .contained(lhs: (Document.Preset.allCases.map(\.rawValue).contains($0.id) ? $0.id : ("." + $0.id)) + " {", rhs: "}", content: organize(styleSheet: $0)) }
                             +
                             animations.map {
                                 HTMLComponent.contained(lhs: "@keyframes " + $0.name + " {", rhs: "}",
@@ -577,6 +577,10 @@ extension Renderer {
         
         if let value = styleSheet.textShadow         { dictionary["text-shadow"] = value.cssValue }
         if let value = styleSheet.boxShadow          { dictionary["box-shadow"] = value.cssValue }
+        
+        if !styleSheet.contains(attribute: "margin") {
+            dictionary["margin"] = "0px"
+        }
         
         
         return .stratum(dictionary.map { .value("\($0.key): \($0.value);")} + additionalAttributes.map { .value("\($0.key): \($0.value);") })

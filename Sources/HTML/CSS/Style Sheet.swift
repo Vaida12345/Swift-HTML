@@ -268,6 +268,10 @@ public struct StyleSheet {
         return StyleSheet(attributes: self.attributes, _attributes: self._attributes, id: self.id, variations: dictionary)
     }
     
+    public func contains(attribute key: String) -> Bool {
+        self.attributes.contains(where: { $0.key == key }) || self._attributes.contains(where: { $0.key == key })
+    }
+    
     
     // MARK: - Designated Initializers
     

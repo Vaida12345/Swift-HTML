@@ -11,6 +11,28 @@ import SwiftUI
 
 final class TableTests: XCTestCase {
     
+    struct ElementBody: Markup {
+        
+        let element: ChemicalElement
+        
+        let color = Color.blue
+        
+        var body: some Markup {
+            VStack {
+                Text(element.atomicNumber.description)
+                    .position(.relative(rect: .init(left: 0, top: 0)))
+                
+                Text(element.symbol)
+                    .textAlignment(.center)
+            }
+            .foregroundColor(color)
+            .frame(width: 100, height: 100)
+            .border(.solid, color: color, width: .thin)
+            .padding(length: 5)
+        }
+        
+    }
+    
     func mainTest() throws {
         let renderer = Renderer()
         
@@ -18,12 +40,16 @@ final class TableTests: XCTestCase {
             Grid(columnsCount: 18) {
                 for element in ChemicalElement.allCases {
                     GridItem(startColumn: element.position.x, startRow: element.position.y) {
-                        Text(element.symbol)
-                            .textAlignment(.center)
+                        ElementBody(element: element)
                     }
                 }
             }
         }
+            .style(for: .body) { sheet in
+                sheet.backgroundColor = .black
+                sheet.fontFamily = "avenir"
+                sheet.margin = .init(left: 0, right: 0, top: 0, bottom: 0)
+            }
         
         
         try renderer.render(document).write(toFile: "\(NSHomeDirectory())/Desktop/untitled.html", atomically: true, encoding: .utf8)

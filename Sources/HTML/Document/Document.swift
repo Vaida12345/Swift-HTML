@@ -39,4 +39,19 @@ public struct Document {
         Document(content: self.content, title: self.title, styles: self.styles + [style], scripts: self.scripts)
     }
     
+    /// Adds a global style.
+    public func style(for preset: Preset, _ result: (_ sheet: inout StyleSheet) -> ()) -> Document {
+        var style = StyleSheet()
+        result(&style)
+        style.id = preset.rawValue
+        
+        return Document(content: self.content, title: self.title, styles: self.styles + [style], scripts: self.scripts)
+    }
+    
+    public enum Preset: String, CaseIterable, Equatable {
+        
+        case body
+        
+    }
+    
 }

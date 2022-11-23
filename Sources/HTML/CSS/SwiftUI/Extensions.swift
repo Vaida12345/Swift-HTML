@@ -73,7 +73,7 @@ public extension Markup {
         var sheet = StyleSheet()
         
         let keyPath = {
-            if let content = self.asType(InLineStyledMarkup.self) {
+            if let content = self.asType(StyledMarkup.self) {
                 let styles = content.style
                 
                 if let style = styles.borderStyle, style != .none {
@@ -87,7 +87,7 @@ public extension Markup {
         }()
         
         let originalEdges = {
-            if let content = self.asType(InLineStyledMarkup.self) {
+            if let content = self.asType(StyledMarkup.self) {
                 let styles = content.style
                 
                 if let style = styles[keyPath: keyPath] {
