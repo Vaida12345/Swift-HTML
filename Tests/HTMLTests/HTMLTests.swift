@@ -17,40 +17,10 @@ final class HTMLTests: XCTestCase {
         style.backgroundColor = .blue.opacity(0.1)
         
         let document = Document(title: "1234") {
-            NavigationBar {
-                Text("Top")
-                    .onTapGesture(.scrollToTop)
-                    .frame(height: .percentage(1))
-            }
-            .listStyle { sheet in
-                sheet.backgroundColor = .gray
-            }
-            .onItemHover { sheet in
-                sheet.backgroundColor = .green
-            }
-            .itemStyle { sheet in
-                sheet.textColor = .green
-            }
-            
-            VGrid {
-                for i in 1...100 {
-                    VStack {
-                        Image(source: "2.jpeg")
-                            .padding(.all, length: .pixel(10))
-                            .cornerRadius(.percentage(0.05))
-                        
-                        Text(i.description + "AAAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAAA")
-                    }
-                    .onTapGesture(href: "Untitled 2.html")
-                    .hideTextDecoration()
-                    .foregroundColor(.black)
-                    .frame(width: .percentage(0.2))
-                    .padding(length: 10)
-                    .withTransition(duration: 0.2)
-                    .onHover { sheet in
-                        sheet.boxShadow = .init(radius: 10)
-                        sheet.borderCornerRadius = .percentage(0.03)
-                    }
+            Grid(columnsCount: 10) {
+                for i in 0...100 {
+                    Text(i.description)
+                        .textAlignment(.center)
                 }
             }
         }

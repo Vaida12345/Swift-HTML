@@ -315,6 +315,36 @@ extension Renderer {
             baseComponents.addAttribute(key: "onclick", value: "\"\(content.script.rawValue)()\"")
             
             return baseComponents
+        } else if let content = value as? Grid {
+            var styleSheet = StyleSheet()
+            styleSheet.set("grid", for: "display")
+            styleSheet.set(content.gap.cssValue, for: "gap")
+            styleSheet.set("repeat(\(content.columnsCount), 1fr)", for: "grid-template-columns")
+            styleSheet.alignment = content.alignment
+            
+            return organize(markup: Division(content: { TupleMarkup(components: content.items.map { AnyMarkup($0) }) }).style(styleSheet), styles: &styles, animations: &animations, scripts: &scripts)
+        } else if let item = value as? GridItem {
+            var styleSheet = StyleSheet()
+            if item.startColumn != nil || item.width != nil {
+                if let column = item.startColumn, let width = item.width {
+                    styleSheet.set("\(column) / span \(width)", for: "grid-column")
+                } else if let column = item.startColumn {
+                    styleSheet.set("\(column)", for: "grid-column")
+                } else if let width = item.width {
+                    styleSheet.set("span \(width)", for: "grid-column")
+                }
+            }
+            if item.startRow != nil || item.height != nil {
+                if let row = item.startRow, let height = item.height {
+                    styleSheet.set("\(row) / span \(height)", for: "grid-row")
+                } else if let row = item.startRow {
+                    styleSheet.set("\(row)", for: "grid-row")
+                } else if let height = item.height {
+                    styleSheet.set("span \(height)", for: "grid-row")
+                }
+            }
+            
+            return organize(markup: item.content.addStyle(styleSheet), styles: &styles, animations: &animations, scripts: &scripts)
         }
         
         assert(!(value.body is Never))

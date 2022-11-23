@@ -225,6 +225,7 @@ public struct StyleSheet {
         }
     }
     
+    /// Set a raw attribute.
     internal mutating func set(_ value: String, for key: String) {
         _attributes[key] = value
     }
