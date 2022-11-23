@@ -214,6 +214,7 @@ public struct StyleSheet {
     /// Add the styles from `sheet`, keeping only new styles under conflict.
     public mutating func addStyle(from sheet: StyleSheet) {
         self.attributes.merge(sheet.attributes, uniquingKeysWith: { (_, new) in new })
+        self._attributes.merge(sheet._attributes, uniquingKeysWith: { (_, new) in new })
     }
     
     /// Add the styles from `sheet`, keeping only new styles under conflict.

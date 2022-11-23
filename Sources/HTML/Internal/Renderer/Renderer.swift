@@ -344,7 +344,7 @@ extension Renderer {
                 }
             }
             
-            return organize(markup: item.content.addStyle(styleSheet), styles: &styles, animations: &animations, scripts: &scripts)
+            return organize(markup: item.content.addStyle(styleSheet, keepSeparate: true), styles: &styles, animations: &animations, scripts: &scripts)
         }
         
         assert(!(value.body is Never))

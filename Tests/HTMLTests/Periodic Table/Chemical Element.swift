@@ -29,6 +29,19 @@ public struct ChemicalElement {
     
     // MARK: - Instance Properties
     
+    public var position: (x: Int, y: Int) {
+        if let group {
+            return (group, period)
+        } else {
+            if self.classification == .lanthanide {
+                return (self.atomicNumber - 55 + 2, period + 2)
+            } else if self.classification == .actinide {
+                return (self.atomicNumber - 87 + 2, period + 2)
+            } else {
+                fatalError()
+            }
+        }
+    }
     
     // MARK: - Instance Methods
     
@@ -73,7 +86,7 @@ public struct ChemicalElement {
           
         ChemicalElement(13,  "Aluminium",     "Al",  26.9815,  group: 13,  period: 3, .postTransitionMetal, block: .p),
         ChemicalElement(14,  "Silicon",       "Si",  28.0855,  group: 14,  period: 3, .metalloid,           block: .p),
-        ChemicalElement(15,  "Phosphorus",    "P",   30.9737,  group: 14,  period: 3, .nonmetal,            block: .p),
+        ChemicalElement(15,  "Phosphorus",    "P",   30.9737,  group: 15,  period: 3, .nonmetal,            block: .p),
         ChemicalElement(16,  "Sulfur",        "S",   32.065,   group: 16,  period: 3, .nonmetal,            block: .p),
         ChemicalElement(17,  "Chlorine",      "Cl",  35.453,   group: 17,  period: 3, .halogen,             block: .p),
         ChemicalElement(18,  "Argon",         "Ar",  39.948,   group: 18,  period: 3, .nobleGas,            block: .p),
@@ -139,8 +152,8 @@ public struct ChemicalElement {
         ChemicalElement(68,  "Erbium",        "Er",  167.259,  group: nil, period: 6, .lanthanide,          block: .f),
         ChemicalElement(69,  "Thulium",       "Tm",  168.934,  group: nil, period: 6, .lanthanide,          block: .f),
         ChemicalElement(70,  "Ytterbium",     "Yb",  173.04,   group: nil, period: 6, .lanthanide,          block: .f),
-         
-        ChemicalElement(71,  "Lutetium",      "Lu",  174.967,  group: 3,   period: 6, .transitionMetal,     block: .d),
+        ChemicalElement(71,  "Lutetium",      "Lu",  174.967,  group: nil, period: 6, .lanthanide,          block: .d),
+        
         ChemicalElement(72,  "Hafnium",       "Hf",  178.49,   group: 4,   period: 6, .transitionMetal,     block: .d),
         ChemicalElement(73,  "Tantalum",      "Ta",  180.947,  group: 5,   period: 6, .transitionMetal,     block: .d),
         ChemicalElement(74,  "Tungsten",      "W",   183.84,   group: 6,   period: 6, .transitionMetal,     block: .d),
@@ -176,8 +189,8 @@ public struct ChemicalElement {
         ChemicalElement(100, "Fermium",       "Fm",  257.0951, group: nil, period: 7, .actinide,            block: .f),
         ChemicalElement(101, "Mendelevium",   "Md",  258.095,  group: nil, period: 7, .actinide,            block: .f),
         ChemicalElement(102, "Nobelium",      "No",  259.1009, group: nil, period: 7, .actinide,            block: .f),
+        ChemicalElement(103, "Lawrencium",    "Lr",  266.1193, group: nil, period: 7, .actinide,            block: .d),
         
-        ChemicalElement(103, "Lawrencium",    "Lr",  266.1193, group: 3,   period: 7, .transitionMetal,     block: .d),
         ChemicalElement(104, "Rutherfordium", "Rf",  261,      group: 4,   period: 7, .transitionMetal,     block: .d),
         ChemicalElement(105, "Dubnium",       "Db",  262,      group: 5,   period: 7, .transitionMetal,     block: .d),
         ChemicalElement(106, "Seaborgium",    "Sg",  262,      group: 6,   period: 7, .transitionMetal,     block: .d),
